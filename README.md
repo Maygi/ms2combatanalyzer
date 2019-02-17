@@ -16,14 +16,10 @@ I have gone over the [Terms of Use](https://www.nexon.com/main/en/legal/tou) and
 
 But, with that in mind: to use MSCA, it's simple! Just follow these easy steps.
 
-1. Download the MSCA zip folder attached to this release.
+1. Go to the [releases] and download the latest version at the bottom. It will be a .zip or .gz file.
 2. Extract the MSCA zip folder.
-3. Download the [SikuliX library](https://github.com/Maygi/ms2combatanalyzer/blob/master/sikulixapi.jar), and save it into the **MSCA_lib** folder.
-4. Run the **MSCA.jar** file.
-5. That's it!
-
-
-
+3. Run the **MSCA.jar** file.
+4. That's it!
 
 # Features
 * Parses total party DPS
