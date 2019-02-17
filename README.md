@@ -21,6 +21,9 @@ But, with that in mind: to use MSCA, it's simple! Just follow these easy steps.
 3. Run the **MSCA.jar** file.
 4. That's it!
 
+*Not working?*
+Scroll to the bottom for some common mistakes that people make~
+
 # Features
 * Parses total party DPS
 * Parser only starts when entering combat with a boss
@@ -56,3 +59,14 @@ But, with that in mind: to use MSCA, it's simple! Just follow these easy steps.
 * Add a feature for estimating the clear time
 * other stuffs... we'll see :3 
 
+# HELP! IT'S NOT WORKING!
+
+*If the overlay is collecting no data...*
+* Are you in fullscreen? It only works in fullscreen :c
+* Is your interface size 50%? You can change this in the game settings.
+* Are you fighting a boss monster? It only parses bosses!
+
+*If the overlay looks like this...*
+![Broken overlay](https://i.imgur.com/sitE9Q0.png)
+* Did you download the entire folder? You'll need the resource folders - namely, MSCA_lib, fonts, images, and sound - to get the overlay to work properly. MSCA.jar should be in a folder outside those.
+* Did you open it with Java? Some people have jar folders to open with WinZip by default. Right-click the .jar file and make sure to open with Java. If you don't have it, you can [download it from the Oracle website.](https://www.java.com/en/download/)
