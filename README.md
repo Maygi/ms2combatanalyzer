@@ -5,7 +5,7 @@ This is an overlay designed to run with **Maplestory2** in the background, that 
 ![An example parse](https://i.imgur.com/eEpsxFN.png)
 
 # How to use
-Currently, MSCA requires that you play in fullscreen mode. Due to how it collects data, note that obstructing your UI at any time may lead to inaccurate results. It was made for 1920x1080 resolution but should (keyword: should) work in different resolutions as long as you're in fullscreen.
+Currently, MSCA requires that you play in fullscreen mode. Due to how it collects data, note that obstructing your UI at any time may lead to inaccurate results. It was made for 1920x1080 resolution but should (keyword: should) work in different resolutions as long as you're in **fullscreen**. Additionally, you must go to your game settings and make sure **Interface Size is at 50%**. Lastly, this overlay only parses encounters with **boss enemies**.
 
 **IMPORTANT!!**
 Nexon has not given their OFFICIAL stance on this yet. I have run the program by them and the best reply I've gotten so far was:
