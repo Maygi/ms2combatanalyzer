@@ -39,6 +39,13 @@ public class HolySymbolCollection extends DataCollection {
 		this.raidDamage = raidDamage;
 	}
 	
+	@Override
+	public void reset() {
+		super.reset();
+		hs.reset();
+		raidDamage.reset();
+	}
+	
 	public void calculate() {
 		List<Integer[]> endPoints = hs.getEndpoints();
 		List<Integer> data = raidDamage.getData();

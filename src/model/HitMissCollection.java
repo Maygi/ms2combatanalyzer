@@ -130,9 +130,12 @@ public class HitMissCollection extends DataCollection {
 		addData(calculatePercentage());
 		addRawData(hit);
 	}
-	
+
+	@Override
 	public void reset() {
 		super.reset();
 		hits = misses = 0;
+		rawData = new ArrayList<Boolean>();
+		endPoints = new ArrayList<Integer[]>();
 	}
 }

@@ -69,6 +69,7 @@ public class DeltaCollection extends DataCollection {
 	public void handleHit(boolean hit) {
 		handleHit(hit, multiplier);
 	}
+	@Override
 	public void reset() {
 		super.reset();
 		total = 0;

@@ -16,7 +16,7 @@ import sound.Sound;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.0
+ * Version 1.0.1
  * @author May
  */
 public class MainDriver {
@@ -313,12 +313,6 @@ public class MainDriver {
     	for (TrackPoint tp : data.keySet()) {
     		DataCollection dc = data.get(tp);
     		dc.reset();
-    		if (dc instanceof HitMissCollection)
-    			((HitMissCollection)dc).reset();
-    		if (dc instanceof CountCollection)
-    			((CountCollection)dc).reset();
-    		if (dc instanceof DeltaCollection)
-    			((DeltaCollection)dc).reset();
     	}
     	startTime = DEFAULT_TIME;
     	active = false;
@@ -399,7 +393,7 @@ public class MainDriver {
         Screen s = new Screen();
         int shields = 0;
         currentTick++;
-        if (currentTick % 10 == 0) {
+        if (currentTick % 10 == 0 && active) {
         	//equalize();
         	((HolySymbolCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).calculate();
         }
@@ -489,6 +483,9 @@ public class MainDriver {
     	        	int[] regionBoss = TrackPoint.BOSS.getRegion();
         	        Region r2 = new Region(regionBoss[0], regionBoss[1], regionBoss[2] - regionBoss[0], regionBoss[3] - regionBoss[1]);
 	    			m = r2.exists(TrackPoint.BOSS.getImage(), 0.01);
+	    			if (m == null) {
+	    				System.out.println("Found HP: "+value+", but unable to find [Boss] tag.");
+	    			}
 	    			if (m != null)
 	    				start();
     	        }

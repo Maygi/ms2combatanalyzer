@@ -31,8 +31,10 @@ public class CountCollection extends DataCollection {
 		}
 		addData(hits);
 	}
-	
+
+	@Override
 	public void reset() {
+		super.reset();
 		hits = 0;
 	}
 }
