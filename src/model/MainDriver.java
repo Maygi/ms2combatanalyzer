@@ -16,6 +16,7 @@ import sound.Sound;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
+ * Version 1.0
  * @author May
  */
 public class MainDriver {
