@@ -4,26 +4,32 @@ This is an overlay designed to run with **Maplestory2** in the background, that 
 ![The MSCA Overlay](https://media.giphy.com/media/RkHuicEN5HldWz6sYO/giphy.gif)
 ![An example parse](https://i.imgur.com/eEpsxFN.png)
 
+# Recent Updates
+Check the [releases](https://github.com/Maygi/ms2combatanalyzer/releases) page to see a list of releases and the relevant update notes.
+
 # How to use
-Currently, MSCA requires that you play in fullscreen mode. Due to how it collects data, note that obstructing your UI at any time may lead to inaccurate results. It was made for 1920x1080 resolution but should (keyword: should) work in different resolutions as long as you're in fullscreen.
+Currently, MSCA requires that you play in fullscreen mode. Due to how it collects data, note that obstructing your UI at any time may lead to inaccurate results. It was made for 1920x1080 resolution but should (keyword: should) work in different resolutions as long as you're in **fullscreen**. Additionally, you must go to your game settings and make sure **Interface Size is at 50%**. Lastly, this overlay only parses encounters with **boss enemies**.
 
 **IMPORTANT!!**
-Nexon has not given their OFFICIAL stance on this yet. I have run the program by them and the best reply I've gotten so far was:
+Nexon does not support third-party applications. That being said, I have received the following response from them:
 
 > We truly appreciate your efforts toward the game. We would like to inform you that as long as you didn't violate any of the TOS, you will not receive any sanctions. I assure you that the game team are reviewing your inquiry.
 
-I have gone over the [Terms of Use](https://www.nexon.com/main/en/legal/tou) and [End User License Agreement](http://www.nexon.net/legal/end-user-license-agreement/) many times and concluded that this overlay should be compliant. However, because Nexon hasn't given official word on it yet, **use of this program is at your own risk** >_>
+I have gone over the [Terms of Use](https://www.nexon.com/main/en/legal/tou) and [End User License Agreement](http://www.nexon.net/legal/end-user-license-agreement/) many times and concluded that this overlay should be compliant. While third-party applications are never supported by Nexon, I do not believe anybody will get banned for using this, but keep in mind that **use of this program is at your own risk** >_>
 
-But, with that in mind: to use MSCA, it's simple! Just follow these easy steps.
+To run MSCA, just follow these easy steps:
 
 1. Go to the [releases](https://github.com/Maygi/ms2combatanalyzer/releases) and download the latest version at the bottom. It will be a .zip or .gz file.
 2. Extract the MSCA zip folder.
 3. Run the **MSCA.jar** file.
 4. That's it!
 
+*Not working?*
+Scroll to the bottom for some common mistakes that people make~
+
 # Features
 * Parses total party DPS
-* Parser only starts when entering combat with a boss
+* Estimates clear time based on average party DPS in and out of Holy Symbol, taking into consideration how many Holy Symbol casts are remaining in the fight
 * User can reset / pause the parse
 * Calculates uptime
   * Personal buffs (Celestial Guardian, Iron Defense, etc)
@@ -56,3 +62,14 @@ But, with that in mind: to use MSCA, it's simple! Just follow these easy steps.
 * Add a feature for estimating the clear time
 * other stuffs... we'll see :3 
 
+# HELP! IT'S NOT WORKING!
+
+*If the overlay is collecting no data...*
+* Are you in fullscreen? It only works in fullscreen :c
+* Is your interface size 50%? You can change this in the game settings.
+* Are you fighting a boss monster? It only parses bosses!
+
+*If the overlay looks like this...*
+![Broken overlay](https://i.imgur.com/sitE9Q0.png)
+* Did you download the entire folder? You'll need the resource folders - namely, MSCA_lib, fonts, images, and sound - to get the overlay to work properly. MSCA.jar should be in a folder outside those.
+* Did you open it with Java? Some people have jar folders to open with WinZip by default. Right-click the .jar file and make sure to open with Java. If you don't have it, you can [download it from the Oracle website.](https://www.java.com/en/download/)

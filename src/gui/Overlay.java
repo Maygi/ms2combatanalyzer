@@ -68,10 +68,27 @@ public class Overlay extends JFrame {
         myChart = new Chart(this);
         tooltipMappings = new HashMap<Tooltip, Boolean>();
     }
+    
+    public void resetTooltips() {
+        tooltipMappings = new HashMap<Tooltip, Boolean>();
+    }
 
     @Override
     public Dimension getPreferredSize() {
         return new Dimension(500, 260);
+    }
+    
+    /**
+     * Loads various properties from the property file.
+     */
+    private void loadProps() {
+        try {
+        	int propX = Integer.parseInt(MainDriver.props.getProperty("x"));
+        	int propY = Integer.parseInt(MainDriver.props.getProperty("y"));
+        	setLocation(propX, propY);
+        } catch (Exception e) {
+        	System.err.println("Unable to load properties on Overlay.");
+        }
     }
     
     public void start() {
@@ -89,6 +106,7 @@ public class Overlay extends JFrame {
         setLocationRelativeTo(null);
         setVisible(true);
         addKeyListener(new KeyboardListener());
+    	loadProps();
         
         addMouseListener(new MouseAdapter(){
            public void mousePressed(MouseEvent ev) {
@@ -98,6 +116,9 @@ public class Overlay extends JFrame {
 	            	int[] coords = b.getCoords();
 	                if (x >= coords[0] && x <= coords[0] + ChartButton.BUTTON_SIZE &&
 	                		y >= coords[1] && y <= coords[1] + ChartButton.BUTTON_SIZE) {
+	                	if (b.getImage().contains("mute")) {
+	                		MainDriver.toggleMute();
+	                	}
 	                	if (b.getImage().contains("pause")) {
 	                		MainDriver.pause();
 	                	}
@@ -105,6 +126,7 @@ public class Overlay extends JFrame {
 	                		MainDriver.reset();
 	                	}
 	                	if (b.getImage().contains("close")) {
+	                		MainDriver.saveProps();
 	                		Sound.SELECT.play();
 	                		System.exit(0);
 	                	}
@@ -150,13 +172,17 @@ public class Overlay extends JFrame {
 	                	break;
 	                }
 	            }
-	            if (!hit)
+	            if (!hit) {
 	            	hover = false;
+	            	if (hoveredTooltip == null)
+	            		myChart.repaint();
+	            }
         	}
             public void mouseDragged(MouseEvent evt) {
                 int x1 = evt.getXOnScreen() - x;
                 int y1 = evt.getYOnScreen() - y;
-                setLocation(x1, y1); 
+                setLocation(x1, y1);
+                MainDriver.saveWindowPosition(x1, y1);
 	            //System.out.println("Move: "+x1+", "+y1);
 
             }

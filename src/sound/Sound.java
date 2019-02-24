@@ -10,6 +10,8 @@ import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
+import model.MainDriver;
+
 /**
  * An enum to handle sound effects, including volumes and file names.
  * @author May
@@ -63,6 +65,8 @@ public enum Sound {
      * @param theVolume The given volume to play at.
      */
     public void play(final int theVolume) {
+    	if (MainDriver.mute)
+    		return;
         if (myClip.isRunning()) {
             myClip.stop();
         }

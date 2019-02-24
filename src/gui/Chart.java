@@ -8,6 +8,7 @@ import java.awt.Point;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -16,6 +17,7 @@ import javax.swing.border.BevelBorder;
 import model.DataCollection;
 import model.MainDriver;
 import model.MainDriver.TrackPoint;
+import model.TimeCollection;
 import particles.CircleParticle;
 import particles.Particle;
 import particles.ParticleEmitter;
@@ -45,9 +47,10 @@ public class Chart extends AbstractLabel {
     private static final double TEXT_PERCENT = 0.12;
     
     public enum ChartButton {
-    	PAUSE(410, 12, "images/ui/pause.png"),
-    	RESET(440, 12, "images/ui/reset.png"),
-    	CLOSE(470, 12, "images/ui/close.png");
+    	MUTE(400, 12, "images/ui/mute.png"),
+    	PAUSE(425, 12, "images/ui/pause.png"),
+    	RESET(450, 12, "images/ui/reset.png"),
+    	CLOSE(475, 12, "images/ui/close.png");
     	
     	public static final int BUTTON_SIZE = 20;
     	private int x, y;
@@ -69,7 +72,7 @@ public class Chart extends AbstractLabel {
     	TrackPoint.SPIRIT,
     	TrackPoint.GUARDIAN, TrackPoint.CELESTIAL_LIGHT,
     	TrackPoint.SHADOW_CHASER,
-    	TrackPoint.IRON_DEFENSE,
+    	TrackPoint.IRON_DEFENSE, TrackPoint.SHIELD_MASTERY,
     	TrackPoint.SNIPE,
     	TrackPoint.DARKAURA,
     	TrackPoint.POISON_EDGE, TrackPoint.POISON_VIAL,
@@ -194,7 +197,8 @@ public class Chart extends AbstractLabel {
 					format(new BigDecimal((int)(dc.getLast() / MainDriver.getEllaspedTime())))  + " DPS";
 	        	image = "images/tableicons/partydps.png";
 			} else if (RAID[i].getName().equalsIgnoreCase("Time")) {
-				text = MainDriver.timeToString(MainDriver.getEllaspedTime());
+				text = MainDriver.timeToString(MainDriver.getEllaspedTime()) + " | " + 
+						(((TimeCollection)(MainDriver.data.get(TrackPoint.TIME))).getEstimate());
 				image = RAID[i].getIcon();
 			} else {
 				if (dc.getLast() <= 0)
@@ -239,7 +243,7 @@ public class Chart extends AbstractLabel {
 	                (int) (getSize().getHeight() * TEXT_PERCENT) * line, 1,
 	                Color.WHITE, SHADOW_COLOR.darker());
 	        int x = MARGIN + xOffset;
-	        int y =(int) (getSize().getHeight() * TEXT_PERCENT) * line - 20;
+	        int y = (int) (getSize().getHeight() * TEXT_PERCENT) * line - 20;
             drawImage(theGraphics, image, x, y);
             addTooltip(PERSONAL[i], x, y);
         }
@@ -265,14 +269,6 @@ public class Chart extends AbstractLabel {
 	        	sb.append(dc.getLast());
 	        	sb.append("%");
 	        }
-			/*if (BUFFS[i].getName().contains("Blessings")) {
-				sb.append(" | ");
-				sb.append(MainDriver.data.get(TrackPoint.BLESSINGS_AMP).getLast());
-			}
-			if (BUFFS[i].getName().contains("Smiting")) {
-				sb.append(" | ");
-				sb.append(MainDriver.data.get(TrackPoint.SMITE_AMP).getLast());
-			}*/
 			text = sb.toString();
 			line++;
 	        drawNormalText(g2d, text, FONT_SIZE, 24 + MARGIN * 2 + GAP,
@@ -283,7 +279,7 @@ public class Chart extends AbstractLabel {
             drawImage(theGraphics, BUFFS[i].getIcon(), x, y);
             addTooltip(BUFFS[i], x, y);
         }
-        String mscaText = "MS2 Combat Analyzer v1.0";
+        String mscaText = "MS2 Combat Analyzer v" + MainDriver.VERSION;
         drawNormalText(g2d, mscaText, Tooltip.TEXT_SIZE * 3 / 4, (int)getSize().getWidth() - 200,
         		(int)getSize().getHeight() - 20, 1,
                 Color.WHITE, SHADOW_COLOR.darker());
@@ -360,6 +356,11 @@ public class Chart extends AbstractLabel {
         	int[] coords = b.getCoords();
             drawImage(theGraphics, b.getImage(), coords[0],  coords[1]);
             Point p = MouseInfo.getPointerInfo().getLocation();
+            boolean active = true;
+            if (b.getImage().contains("pause") && !MainDriver.active)
+            	active = false;
+            if (b.getImage().contains("mute") && MainDriver.mute)
+            	active = false;
             if (p != null) {
             	Point diff = getLocationOnScreen();
             	p.translate((int)(-1 * diff.getX()), (int)(-1 * diff.getY()));
@@ -372,7 +373,7 @@ public class Chart extends AbstractLabel {
                 	}
                 }
             }
-        	if (b.getImage().contains("pause") && !MainDriver.active) {
+        	if (!active) {
         		drawSquare(theGraphics, coords[0], coords[1], ChartButton.BUTTON_SIZE, Color.BLACK, (float) 0.5);
         	}
         }
@@ -437,6 +438,7 @@ public class Chart extends AbstractLabel {
     				word++;
     			}
     		}
+    		//System.out.println(Arrays.toString(toReturn));
     		toReturn[index] = newLine.toString();
     		index++;
     	}

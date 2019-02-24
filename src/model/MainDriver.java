@@ -3,7 +3,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 
 import javax.swing.UIManager;
@@ -12,19 +19,29 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.sikuli.script.*;
 
 import gui.Overlay;
+import gui.Tooltip;
 import sound.Sound;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.0.1
+ * Version 1.1
  * @author May
  */
 public class MainDriver {
 	
+	public static final String VERSION = "1.1";
+	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
 	
+	/**
+	 * The delay, in milliseconds, before the tracker will automatically restart (when entering combat)
+	 * after a pause.
+	 */
+	private static final long RESET_THRESHOLD = 10000;
+	
 	public static boolean active = false;
+	public static boolean mute = false;
 	private static final long DEFAULT_TIME = -5000000;
 	private static long pauseTime = DEFAULT_TIME;
 	private static long startTime = DEFAULT_TIME;
@@ -52,10 +69,11 @@ public class MainDriver {
 
 		//buffs
 		IRON_DEFENSE("Iron Defense", "Increases SP regen, and decreases damage taken and dealt", "irondefense.png", 550, 740, 890, 890),
+		SHIELD_MASTERY("Shield Mastery", "Increases damage after a successful block", "shieldmastery.png", 550, 740, 890, 890, 0.999),
 		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", 550, 740, 890, 890, 0.995),
 		BLESSINGS("Celestial Blessings", "Increases damage and resistance", "blessings.png", 550, 740, 890, 890, 0.9),
 		SHARPEYES("Sharp Eyes", "Increases critical rate and accuracy", "sharpeyes.png", 550, 740, 890, 890, 0.999),
-		FOCUSSEAL("Focus Seal", "Increases physical/magic attack", "focusseal.png", 550, 740, 890, 890, 0.999),
+		FOCUSSEAL("Focus Seal", "Increases physical/magic attack", "focusseal.png", 550, 740, 890, 890, 0.9995),
 		WARHORN("Warhorn", "Increases physical/magic attack", "warhorn.png", 550, 740, 890, 890, 0.999),
 		HONINGRUNES("Honing Runes", "Increases critical damage", "honingrunes.png", 550, 740, 890, 890, 0.999),
 		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", 550, 740, 890, 890, 0.99),
@@ -69,7 +87,7 @@ public class MainDriver {
 		HP("HP", "", 1099, 76, 1099 + 198, 76 + 29),
 		BOSS("HP", "", "boss.png", 643, 77, 685, 102),
 		RAID_DPS("Raid DPS", "Average raid damage per second"),
-		TIME("Time", "Total ellasped time of the encounter", "clock.png"),
+		TIME("Time", "Total ellasped time of the encounter and estimated clear time", "clock.png"),
 		HOLY_SYMBOL_DAMAGE("Holy Symbol Damage", "Estimated contribution of Holy Symbol", "holysymbol.png"),
 		HOLY_SYMBOL_DAMAGE_RAW("Holy Symbol Damage (Raw)", "Total damage dealt during Holy Symbol", "holysymbolraw.png"),
 		SMITE_AMP("Damage Amplified: ", "0"),
@@ -77,6 +95,7 @@ public class MainDriver {
 		SHIELDTOSS_AMP("Damage Amplified: ", "0"), //are these redundant or what
 		STATIC_FLASH_AMP("Damage Amplified: ", "0"),
 		MOD_AMP("Damage Amplified: ", "0"),
+		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png"),
 		INFERNOG_BOMB("Infernog Blue Bomb", "Drops a puddle when the timer ends", "infernogbomb.png", 1000, 750, 1300, 900, 0.99),
 		BOSS_HEAL("Boss Healing", "Number of times the boss healed", "bossheal.png", 630, 0, 730, 55, 0.99),
 		SHIELD("Shield Uptime", "Reduces damage taken by 50%", "shield.png", 630, 0, 730, 55, 0.99),
@@ -204,8 +223,41 @@ public class MainDriver {
 	private static Overlay overlay = new Overlay();
     
     public static final Color MAIN_COLOR = new Color(255, 209, 220);
+	public static Properties props;
+    
+    /**
+     * Loads various properties from the property file.
+     */
+    private static void loadProps() {
+        try {
+        	boolean isMute = Boolean.parseBoolean(MainDriver.props.getProperty("mute"));
+        	mute = isMute;
+        } catch (Exception e) {
+        	System.err.println("Unable to load properties on MainDriver.");
+        }
+    }
 	
     public static void main(String[] args) {
+    	props = new Properties();
+    	try {
+    		props.load(new FileReader("config.properties"));
+    		loadProps();
+		} catch (FileNotFoundException e) {
+			System.out.println("Preferences not found - creating.");
+			FileOutputStream file;
+			try {
+				file = new FileOutputStream("config.properties");
+				props.store(file, null);
+			} catch (FileNotFoundException e1) {
+				System.err.println("Error in loading properties.");
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				System.err.println("Error in loading properties.");
+				e1.printStackTrace();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -214,6 +266,26 @@ public class MainDriver {
             }
         });
     	run();
+    }
+    
+    public static void saveProps() {
+		FileOutputStream file;
+		try {
+			file = new FileOutputStream("config.properties");
+			props.store(file, null);
+		} catch (FileNotFoundException e) {
+			System.err.println("Error in saving properties.");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("Error in saving properties.");
+			e.printStackTrace();
+		}
+    	
+    }
+    
+    public static void saveWindowPosition(int x, int y) {
+    	props.setProperty("x", Integer.toString(x));
+    	props.setProperty("y", Integer.toString(y));
     }
     
     /**
@@ -267,6 +339,7 @@ public class MainDriver {
     public static void initializeData() {
     	screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     	data = new TreeMap<TrackPoint, DataCollection>();
+        data.put(TrackPoint.TIME, new TimeCollection());
         data.put(TrackPoint.HP, new DataCollection());
         data.put(TrackPoint.RAID_DPS, new DeltaCollection(data.get(TrackPoint.HP), 1)); //this counts total damage; divided by seconds in chart
         data.put(TrackPoint.DMG_MITIGATED, new DeltaCollection(data.get(TrackPoint.HP), 1)); //mitigated is conditional - see tick method
@@ -296,14 +369,25 @@ public class MainDriver {
         data.put(TrackPoint.GUARDIAN, new HitMissCollection());
         data.put(TrackPoint.SHADOW_CHASER, new HitMissCollection());
         data.put(TrackPoint.CELESTIAL_LIGHT, new HitMissCollection());
+        data.put(TrackPoint.SHIELD_MASTERY, new HitMissCollection());
         data.put(TrackPoint.SPIRIT, new HitMissCollection());
         data.put(TrackPoint.HOLY_SYMBOL, new HitMissCollection());
         data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection());
+        data.put(TrackPoint.DUNGEON_COMPLETE, new HitMissCollection());
         data.put(TrackPoint.VARR_WINGS, new HitMissCollection(Sound.PROC, 10));
         data.put(TrackPoint.INFERNOG_BOMB, new HitMissCollection(Sound.STATUS_WARNING, 11));
-        data.put(TrackPoint.HOLY_SYMBOL_DAMAGE, new HolySymbolCollection((HitMissCollection)data.get(TrackPoint.HOLY_SYMBOL), 
+        data.put(TrackPoint.HOLY_SYMBOL_DAMAGE, new DPSCollection((HitMissCollection)data.get(TrackPoint.HOLY_SYMBOL), 
             	(DeltaCollection)data.get(TrackPoint.RAID_DPS)));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW, new DeltaCollection(data.get(TrackPoint.HP), 1)); //assumes max level
+    }
+    
+    /**
+     * Toggles the mute state.
+     */
+    public static void toggleMute() {
+    	mute = !mute;
+    	Sound.PAUSE.play();
+    	props.setProperty("mute", Boolean.toString(mute));
     }
     
     /**
@@ -315,8 +399,10 @@ public class MainDriver {
     		dc.reset();
     	}
     	startTime = DEFAULT_TIME;
+    	pauseTime = DEFAULT_TIME;
     	active = false;
     	Sound.RESET.play();
+        overlay.resetTooltips();
     }
     
     /**
@@ -329,19 +415,33 @@ public class MainDriver {
 	    	Sound.PAUSE.play();
     	}
     }
+    
+    /**
+     * Pauses the collection of combat data fully.
+     */
+    public static void end() {
+		pauseTime = DEFAULT_TIME;
+    	active = false;
+    	Sound.PAUSE.play();
+    }
     /**
      * Starts the collection of combat data.
      */
     public static void start() {
     	if (!active) {
-        	active = true;
         	if (pauseTime != DEFAULT_TIME) {
         		long differential = pauseTime - startTime;
+        		System.out.println("Differential: "+differential);
+        		if (differential > RESET_THRESHOLD) {
+        			differential = 0;
+        			reset();
+        		}
         		startTime = System.currentTimeMillis() - differential;
         		pauseTime = DEFAULT_TIME;
         	} else {
         		startTime = System.currentTimeMillis();
         	}
+        	active = true;
     	}
     }
     /**
@@ -350,6 +450,15 @@ public class MainDriver {
      */
     public static int getEllaspedTime() {
     	return (int)(Math.abs((active ? System.currentTimeMillis() : pauseTime) - startTime) / 1000);
+    }
+    
+    /**
+     * Returns the ellasped time in seconds after the given argument.
+     * @param time The time to compare to.
+     * @return An int representing the ellasped time in seconds after the argument.
+     */
+    public static int getEllaspedTime(long time) {
+    	return (int)(Math.abs(time - startTime) / 1000);    	
     }
     
     /**
@@ -395,12 +504,17 @@ public class MainDriver {
         currentTick++;
         if (currentTick % 10 == 0 && active) {
         	//equalize();
-        	((HolySymbolCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).calculate();
+        	((DPSCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).calculateHSDamage();
+        	((DPSCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).calculateAverageDamage();
         }
     	for (TrackPoint tp : data.keySet()) {
     		DataCollection dc = data.get(tp);
     		String image = tp.getImage();
     		Match m;
+    		if (dc instanceof TimeCollection) {
+    			((TimeCollection) dc).addData(System.currentTimeMillis());
+    			continue;
+    		}
     		if (image != null && (dc instanceof HitMissCollection || dc instanceof CountCollection)) {
 	    		boolean hit;
 	    		if (tp.usesScreen()) {
@@ -417,6 +531,10 @@ public class MainDriver {
 				hit = m != null && m.getScore() >= tp.getThreshold();
 				//if (m != null && tp.getName().contains("ings"))
 				//	System.out.println(tp.getName()+": "+m.getScore());
+				if (tp.getName().contains("Dungeon Complete") && hit) {
+					pause();
+					break;
+				}
 				if (tp.getName().contains("Smiting Aura") && hit)
 					((DeltaCollection)data.get(TrackPoint.SMITE_AMP)).handleHit(true);
 				if (tp.getName().contains("Static Flash") && hit)
@@ -478,20 +596,19 @@ public class MainDriver {
     	        		
     	        	}
     	        }
-    	        dc.addData(value);
     	        if (value != -1 && tp.getName().contains("HP") && !active) {
     	        	int[] regionBoss = TrackPoint.BOSS.getRegion();
         	        Region r2 = new Region(regionBoss[0], regionBoss[1], regionBoss[2] - regionBoss[0], regionBoss[3] - regionBoss[1]);
 	    			m = r2.exists(TrackPoint.BOSS.getImage(), 0.01);
 	    			if (m == null) {
 	    				System.out.println("Found HP: "+value+", but unable to find [Boss] tag.");
+	    			} else {
+		    			System.out.println("Starting: "+value);
+		    			if (m != null && value > 0)
+		    				start();
 	    			}
-	    			if (m != null)
-	    				start();
     	        }
-    	        if (tp.getName().contains("HP") && value == 0) {
-    	        	pause();
-    	        }
+    	        dc.addData(value);
     		}
     	}
     	((DeltaCollection)data.get(TrackPoint.RAID_DPS)).handleHit(true);
