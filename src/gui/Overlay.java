@@ -55,7 +55,14 @@ public class Overlay extends AbstractFrame {
         try {
         	int propX = Integer.parseInt(MainDriver.props.getProperty("x"));
         	int propY = Integer.parseInt(MainDriver.props.getProperty("y"));
-        	setLocation(propX, propY);
+        	if (propX < 0 || propY < 0) {
+            	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            	int newX = (int) (screenSize.getWidth() / 2);
+            	int newY = (int) (screenSize.getHeight() / 2);
+        		setLocation(newX, newY);
+        	} else {
+        		setLocation(propX, propY);
+        	}
         } catch (Exception e) {
         	System.err.println("Unable to load properties on Overlay.");
         }
