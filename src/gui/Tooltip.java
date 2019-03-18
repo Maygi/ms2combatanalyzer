@@ -2,6 +2,8 @@ package gui;
 
 import java.util.Objects;
 
+import sound.Sound;
+
 /**
  * A class that represents tooltips.
  * @author May
@@ -9,14 +11,26 @@ import java.util.Objects;
 public class Tooltip {
 	
 	public static final int TEXT_SIZE = 16;
-	private int x, y;
+	private static final int BASE_SIZE = 24;
+	private int x, y, xSize, ySize;
 	private String title, text;
 	
 	public Tooltip(int x, int y, String title, String text) {
 		this.x = x;
 		this.y = y;
+		this.xSize = BASE_SIZE;
+		this.ySize = BASE_SIZE;
 		this.title = title;
 		this.text = text;
+	}
+	
+	public Tooltip(int x, int y, String title, String text, int xSize, int ySize) {
+		this.x = x;
+		this.y = y;
+		this.title = title;
+		this.text = text;
+		this.xSize = xSize;
+		this.ySize = ySize;
 	}
 	
 	/**
@@ -27,12 +41,22 @@ public class Tooltip {
 		return new int[] {x, y};
 	}
 	
+	public boolean checkCollision(int x, int y) {
+    	int[] coords = getCoords();
+        return (x >= coords[0] && x <= coords[0] + xSize &&
+        		y >= coords[1] && y <= coords[1] + ySize);
+	}
+	
 	public String getTitle() {
 		return title;
 	}
 	
 	public String getText() {
 		return text;
+	}
+	
+	public void setText(String text) {
+		this.text = text;
 	}
 	
 	@Override
@@ -44,6 +68,6 @@ public class Tooltip {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(title, text);
+		return Objects.hash(title);
 	}
 }

@@ -33,9 +33,18 @@ public class TimeCollection extends DataCollection {
 	 * @return The time between the two indices in seconds. 0 if the indices are invalid.
 	 */
 	public int getTime(int start, int end) {
-		if (start < 0 || end >= data.size())
+		if (start == -1 || end == -1 || start < 0 || end >= data.size())
 			return 0;
 		return (int)((data.get(end) - data.get(start)) / 1000);
+	}
+	
+	public double getTimeMultiplier() {
+		if (data.size() == 0)
+			return 1;
+		int seconds = getTime(0, data.size() - 1);
+		if (seconds == 0)
+			return 1; //for now...
+		return (double)data.size() / (double)seconds;
 	}
 	
 	/**
@@ -80,7 +89,7 @@ public class TimeCollection extends DataCollection {
 			double hsWeight = ((double)hsDuration * hsCastsLeft) / (double)rough;
 			int avgRealDPS = (int)((double)(avgDPS * (1.0 - hsWeight)) + (double)hsDPS * hsWeight);
 			int real = MainDriver.getEllaspedTime() + (hp / avgRealDPS);
-			System.out.println("HS Duration: "+hsDuration+"; HS DPS: "+hsDPS+"; AVG DPS: "+avgDPS+"; HP: "+hp+"; Real DPS: "+avgRealDPS+"; HS casts left: "+hsCastsLeft);
+			//System.out.println("HS Duration: "+hsDuration+"; HS DPS: "+hsDPS+"; AVG DPS: "+avgDPS+"; HP: "+hp+"; Real DPS: "+avgRealDPS+"; HS casts left: "+hsCastsLeft);
 			lastReading = real;
 			return real;
 		} catch (Exception e) {
@@ -90,6 +99,10 @@ public class TimeCollection extends DataCollection {
 	
 	public void addData(long time) {
 		data.add(time);
+	}
+	
+	public List<Long> getTimeData() {
+		return data;
 	}
 	
 	@Override

@@ -3,23 +3,17 @@ package gui;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontFormatException;
-import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.SpringLayout;
 
-import gui.Chart.ChartButton;
 import model.MainDriver;
 import sound.Sound;
 
@@ -27,29 +21,11 @@ import sound.Sound;
  * The main JFrame that contains the chart and handles several mouse events.
  * @author May
  */
-public class Overlay extends JFrame {
-	
-	protected Map<Tooltip, Boolean> tooltipMappings;
-	protected Tooltip hoveredTooltip = null;
+public class Overlay extends AbstractFrame {
 	
 	private final SpringLayout myLayout;
 	
 	private final Chart myChart;
-
-    /**
-     * The font URL.
-     */
-    private static final String FONT_URL = "fonts/AYearWithoutRain.ttf";
-    
-    /**
-     * The font size.
-     */
-    private static final int FONT_SIZE = 40;
-    
-    /**
-     * The font.
-     */
-    private Font myFont;
     
 	private static final long serialVersionUID = -2095870715941752227L;
 	
@@ -60,17 +36,11 @@ public class Overlay extends JFrame {
 
     public Overlay() {
         super("");
-        initializeFont();
         //setIconImage((new ImageIcon("images/ui/avi.gif")).getImage());
         setPreferredSize(getPreferredSize());
         setMinimumSize(getPreferredSize());
         myLayout = new SpringLayout();
         myChart = new Chart(this);
-        tooltipMappings = new HashMap<Tooltip, Boolean>();
-    }
-    
-    public void resetTooltips() {
-        tooltipMappings = new HashMap<Tooltip, Boolean>();
     }
 
     @Override
@@ -91,11 +61,17 @@ public class Overlay extends JFrame {
         }
     }
     
+    public void openReport() {
+    	Report report = new Report();
+    	report.start();
+    	Sound.SELECT.play();
+    }
+    
     public void start() {
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     	x = (int) (screenSize.getWidth() / 2);
     	y = (int) (screenSize.getHeight() / 2);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setAutoRequestFocus(false);
         setFocusableWindowState(false);
         setUndecorated(true);
@@ -112,10 +88,13 @@ public class Overlay extends JFrame {
            public void mousePressed(MouseEvent ev) {
 	            x = ev.getX();
 	            y = ev.getY();
-	            for (final ChartButton b : ChartButton.class.getEnumConstants()) {
+	            for (final GuiButton b : GuiButton.class.getEnumConstants()) {
 	            	int[] coords = b.getCoords();
-	                if (x >= coords[0] && x <= coords[0] + ChartButton.BUTTON_SIZE &&
-	                		y >= coords[1] && y <= coords[1] + ChartButton.BUTTON_SIZE) {
+	                if (x >= coords[0] && x <= coords[0] +  b.getWidth()  &&
+	                		y >= coords[1] && y <= coords[1] + b.getHeight()) {
+	                	if (b.getImage().contains("report")) {
+	                		openReport();
+	                	}
 	                	if (b.getImage().contains("mute")) {
 	                		MainDriver.toggleMute();
 	                	}
@@ -141,10 +120,10 @@ public class Overlay extends JFrame {
 	            x = ev.getX();
 	            y = ev.getY();
 	            boolean hit = false;
-	            for (final ChartButton b : ChartButton.class.getEnumConstants()) {
+	            for (final GuiButton b : GuiButton.class.getEnumConstants()) {
 	            	int[] coords = b.getCoords();
-	                if (x >= coords[0] && x <= coords[0] + ChartButton.BUTTON_SIZE &&
-	                		y >= coords[1] && y <= coords[1] + ChartButton.BUTTON_SIZE) {
+	                if (x >= coords[0] && x <= coords[0] + b.getWidth() &&
+	                		y >= coords[1] && y <= coords[1] + b.getHeight()) {
 	                	if (!hover) {
 	                    	if (b.getImage().contains("pause") && !MainDriver.active) {
 	                    		//discrete logic (^:
@@ -158,10 +137,7 @@ public class Overlay extends JFrame {
 	                }
 	            }
 	            for (final Tooltip tooltip : tooltipMappings.keySet()) {
-	            	final int SIZE = 24;
-	            	int[] coords = tooltip.getCoords();
-	                if (x >= coords[0] && x <= coords[0] + SIZE &&
-	                		y >= coords[1] && y <= coords[1] + SIZE) {
+	                if (tooltip.checkCollision(x, y)) {
 	                	hoveredTooltip = tooltip;
 	                	if (!hover) {
 	                    	Sound.HOVER.play();
@@ -227,18 +203,6 @@ public class Overlay extends JFrame {
         setVisible(true);
     	revalidate();
     	repaint();
-    }
-    private void initializeFont() {
-        try {
-            myFont = Font.createFont(Font.TRUETYPE_FONT, new File(FONT_URL));
-            myFont = myFont.deriveFont(Font.BOLD, FONT_SIZE);
-            final GraphicsEnvironment graphics =
-                            GraphicsEnvironment.getLocalGraphicsEnvironment();
-            graphics.registerFont(myFont);
-            setFont(myFont);	
-        } catch (final FontFormatException | IOException e) {
-            myFont = new Font("TimesRoman", Font.PLAIN, FONT_SIZE);
-        }
     }
     
     /**

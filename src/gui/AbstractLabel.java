@@ -295,6 +295,32 @@ public abstract class AbstractLabel extends JLabel {
     }
 
     /**
+     * Draws colored text at the certain X and Y position, center aligned.
+     * The shadow for this text is less offset than normal, making it more slim.
+     * @param theGraphics The graphics reference.
+     * @param theText The text to draw.
+     * @param theSize The size to draw the text at.
+     * @param theX The X coordinate to draw at.
+     * @param theY The Y coordinate to draw at.
+     * @param theEmphasis The bonus to size. (1.5 = 150% size)
+     * @param theColor The color to draw at.
+     * @param theShadow The shadow color.
+     */
+    public void drawNormalTextCentered(final Graphics theGraphics, final String theText, 
+                                final int theSize, final int theX,
+                                final int theY, final double theEmphasis,
+                                final Color theColor, final Color theShadow) {
+        final Font scaledFont = myFrame.getFont().deriveFont((float) (theSize * theEmphasis
+                * getScaleFactor()));
+        theGraphics.setFont(scaledFont.deriveFont(Font.BOLD));
+        FontMetrics metrics = theGraphics.getFontMetrics();
+        theGraphics.setColor(theShadow);
+        theGraphics.drawString(theText, theX - metrics.stringWidth(theText) / 2 + 1, theY + 1);
+        theGraphics.setColor(theColor);
+        theGraphics.drawString(theText, theX - metrics.stringWidth(theText) / 2, theY);
+    }
+
+    /**
      * Adds the given particle to the queue.
      * @param theParticle The particle to add.
      */

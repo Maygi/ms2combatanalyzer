@@ -5,11 +5,15 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.border.BevelBorder;
@@ -46,34 +50,18 @@ public class Chart extends AbstractLabel {
      */
     private static final double TEXT_PERCENT = 0.12;
     
-    public enum ChartButton {
-    	MUTE(400, 12, "images/ui/mute.png"),
-    	PAUSE(425, 12, "images/ui/pause.png"),
-    	RESET(450, 12, "images/ui/reset.png"),
-    	CLOSE(475, 12, "images/ui/close.png");
-    	
-    	public static final int BUTTON_SIZE = 20;
-    	private int x, y;
-    	private String image;
-    	private ChartButton(int x, int y, String image) {
-    		this.x = x;
-    		this.y = y;
-    		this.image = image;
-    	}
-    	public int[] getCoords() {
-    		return new int[]{x, y};
-    	}
-    	public String getImage() {
-    		return image;
-    	}
-    }
+    private static final GuiButton[] BUTTONS = {
+		GuiButton.CLOSE, GuiButton.MUTE, GuiButton.PAUSE,
+		GuiButton.REPORT, GuiButton.RESET
+    };
+    
     
     private static final TrackPoint[] PERSONAL = {
     	TrackPoint.SPIRIT,
     	TrackPoint.GUARDIAN, TrackPoint.CELESTIAL_LIGHT,
-    	TrackPoint.SHADOW_CHASER,
+    	TrackPoint.SHADOW_CHASER, TrackPoint.FATAL_STRIKES,
     	TrackPoint.IRON_DEFENSE, TrackPoint.SHIELD_MASTERY,
-    	TrackPoint.SNIPE,
+    	TrackPoint.SNIPE, TrackPoint.BRONZE_EAGLE, TrackPoint.EAGLES_MAJESTY,
     	TrackPoint.DARKAURA,
     	TrackPoint.POISON_EDGE, TrackPoint.POISON_VIAL,
     	TrackPoint.VARR_WINGS, TrackPoint.WEAPON_PROC
@@ -352,97 +340,9 @@ public class Chart extends AbstractLabel {
         for (final Particle p : myParticles) {
             p.draw(g2d);
         }
-        for (final ChartButton b : ChartButton.class.getEnumConstants()) {
-        	int[] coords = b.getCoords();
-            drawImage(theGraphics, b.getImage(), coords[0],  coords[1]);
-            Point p = MouseInfo.getPointerInfo().getLocation();
-            boolean active = true;
-            if (b.getImage().contains("pause") && !MainDriver.active)
-            	active = false;
-            if (b.getImage().contains("mute") && MainDriver.mute)
-            	active = false;
-            if (p != null) {
-            	Point diff = getLocationOnScreen();
-            	p.translate((int)(-1 * diff.getX()), (int)(-1 * diff.getY()));
-                if (p.getX() >= coords[0] && p.getX() <= coords[0] + ChartButton.BUTTON_SIZE &&
-                		p.getY() >= coords[1] && p.getY() <= coords[1] + ChartButton.BUTTON_SIZE) {
-                	if (b.getImage().contains("pause") && !MainDriver.active) {
-                		//discrete logic where
-                	} else {
-                		drawSquare(theGraphics, coords[0], coords[1], ChartButton.BUTTON_SIZE, Color.WHITE, (float) 0.5);
-                	}
-                }
-            }
-        	if (!active) {
-        		drawSquare(theGraphics, coords[0], coords[1], ChartButton.BUTTON_SIZE, Color.BLACK, (float) 0.5);
-        	}
+        for (final GuiButton b : BUTTONS) {
+        	b.handleDraw(this, theGraphics);
         }
-        Tooltip hover = ((Overlay)myFrame).hoveredTooltip;
-        if (hover != null) {
-            Point p = MouseInfo.getPointerInfo().getLocation();
-        	Point diff = getLocationOnScreen();
-        	p.translate((int)(-1 * diff.getX()), (int)(-1 * diff.getY()));
-        	p.translate(20, 20);
-        	//g2d.getFontMetrics().stringWidth(hover.getTitle())
-	        String[] realLines = getLines(hover.getText(), g2d);
-	        int boxY = Tooltip.TEXT_SIZE * (realLines.length + 1) + MARGIN * 3;
-	        int yOffset = 0;
-	        if ((int)p.getY() + boxY > getBounds().getHeight()) {
-	        	yOffset = -1 * boxY;
-	        }
-	        if (p.getY() + yOffset + boxY > getBounds().getHeight()) {
-	        	int total = (int)(p.getY() + yOffset + boxY);
-	        	yOffset -= total - getBounds().getHeight();
-	        }
-    		drawRect(theGraphics, (int)p.getX(), (int)p.getY() + yOffset, (int)(getMaxLineWidth(g2d, hover.getTitle(), realLines) * 0.75) + MARGIN * 2,
-    				boxY, Color.BLACK, (float) 0.7);
-	        drawNormalText(g2d, hover.getTitle(), Tooltip.TEXT_SIZE, (int)p.getX() + MARGIN, (int)p.getY() + MARGIN * 3 + yOffset, 1,
-	                Color.WHITE, SHADOW_COLOR.darker());
-	        for (int i = 0; i < realLines.length; i++) {
-		        drawNormalText(g2d, realLines[i], Tooltip.TEXT_SIZE, (int)p.getX() + MARGIN,
-		        		(int)p.getY() + MARGIN * 5 + Tooltip.TEXT_SIZE * (i + 1) + yOffset, 1, Color.WHITE, SHADOW_COLOR.darker());
-	        }
-        }
+        ((Overlay)myFrame).drawTooltips(theGraphics, this);
     }
-    
-    private int getMaxLineWidth(Graphics2D g2d, String title, String[] lines) {
-    	int maxWidth = 0;
-    	for (String s : lines) {
-    		if (s == null)
-    			continue;
-    		int width = (int)g2d.getFontMetrics().stringWidth(s);
-    		if (width > maxWidth)
-    			maxWidth = width;
-    	}
-    	return Math.max(maxWidth, g2d.getFontMetrics().stringWidth(title));
-    }
-    
-    private String[] getLines(String text, Graphics2D g2d) {
-    	final int WIDTH = 240;
-    	int lines = (int)(Math.ceil((double)g2d.getFontMetrics().stringWidth(text) / (double)WIDTH));
-    	String[] toReturn = new String[lines];
-    	int word = 0;
-    	String[] words = text.split(" ");
-    	int index = 0;
-    	while (word < words.length && text.length() > 0) {
-    		StringBuilder newLine = new StringBuilder();
-    		while (word < words.length && g2d.getFontMetrics().stringWidth(newLine.toString()) < WIDTH) {
-    			newLine.append(words[word]);
-    			newLine.append(" ");
-    			if (g2d.getFontMetrics().stringWidth(newLine.toString().substring(0, newLine.toString().length() - 1)) > WIDTH) { //carry-over
-    				String oversize = newLine.toString().substring(0, newLine.toString().length() - 1);
-    				newLine = new StringBuilder();
-    				newLine.append(oversize.substring(0, oversize.lastIndexOf(" ")));
-    				break;
-    			} else {
-    				word++;
-    			}
-    		}
-    		//System.out.println(Arrays.toString(toReturn));
-    		toReturn[index] = newLine.toString();
-    		index++;
-    	}
-    	return toReturn;
-    }
-
 }

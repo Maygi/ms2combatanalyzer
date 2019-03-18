@@ -3,12 +3,13 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
@@ -19,7 +20,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import org.sikuli.script.*;
 
 import gui.Overlay;
-import gui.Tooltip;
+import gui.Report;
+import model.MainDriver.TrackPoint;
 import sound.Sound;
 
 /**
@@ -29,7 +31,7 @@ import sound.Sound;
  */
 public class MainDriver {
 	
-	public static final String VERSION = "1.1";
+	public static final String VERSION = "1.2";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -46,6 +48,7 @@ public class MainDriver {
 	private static long pauseTime = DEFAULT_TIME;
 	private static long startTime = DEFAULT_TIME;
 	private static Dimension screenSize = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	private static Resolution resolution;
 
 	/**
 	 * The TrackPoint enum, which describes several constants for image or text recognition.
@@ -57,35 +60,38 @@ public class MainDriver {
 	public enum TrackPoint {
 		
 		//debuffs
-		SMITE("Smiting Aura", "Increases damage taken by target", "smitingaura.png", 640, 130, 1330, 240),
-		SHIELDTOSS("Shield Toss", "Decreases defense of target", "shieldtoss.png", 640, 130, 1330, 240, 0.999),
-		MOD("Mark of Death", "Increases damage taken by target", "markofdeath.png", 640, 130, 1330, 240, 0.9995),
-		CELESTIAL_LIGHT("Celestial Light", "Inflicts damage over time and increases SP regen by 50%", "celestiallight.png", 640, 130, 1330, 240, 0.999),
-		STATIC_FLASH("Static Flash", "Decreases defense of target", "staticflash.png", 640, 130, 1330, 240, 0.9995),
-		RAGING_TEMPEST("Raging Tempest", "Decreases target's evasion and accuracy", "ragingtempest.png", 640, 130, 1330, 240, 0.999),
-		SHADOW_CHASER("Shadow Chaser", "Recovers an additional 1 spirit every 0.1 seconds", "shadowchaser.png", 640, 130, 1330, 240, 0.999),
-		POISON_EDGE("Poison Edge", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonedge.png", 640, 130, 1330, 240, 0.999),
-		POISON_VIAL("Poison Vial", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonvial.png", 640, 130, 1330, 240, 0.999),
+		SMITE("Smiting Aura", "Increases damage taken by target", "smitingaura.png", Resolution.BOSS_DEBUFFS),
+		SHIELDTOSS("Shield Toss", "Decreases defense of target", "shieldtoss.png", Resolution.BOSS_DEBUFFS, 0.999),
+		MOD("Mark of Death", "Increases damage taken by target", "markofdeath.png", Resolution.BOSS_DEBUFFS, 0.999),
+		CELESTIAL_LIGHT("Celestial Light", "Inflicts damage over time and increases SP regen by 50%", "celestiallight.png", Resolution.BOSS_DEBUFFS, 0.999),
+		STATIC_FLASH("Static Flash", "Decreases defense of target", "staticflash.png", Resolution.BOSS_DEBUFFS, 0.9995),
+		RAGING_TEMPEST("Raging Tempest", "Decreases target's evasion and accuracy", "ragingtempest.png", Resolution.BOSS_DEBUFFS, 0.999),
+		SHADOW_CHASER("Shadow Chaser", "Recovers an additional 1 spirit every 0.1 seconds", "shadowchaser.png", Resolution.BOSS_DEBUFFS, 0.999),
+		POISON_EDGE("Poison Edge", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonedge.png", Resolution.BOSS_DEBUFFS, 0.999),
+		POISON_VIAL("Poison Vial", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonvial.png", Resolution.BOSS_DEBUFFS, 0.999),
 
 		//buffs
-		IRON_DEFENSE("Iron Defense", "Increases SP regen, and decreases damage taken and dealt", "irondefense.png", 550, 740, 890, 890),
-		SHIELD_MASTERY("Shield Mastery", "Increases damage after a successful block", "shieldmastery.png", 550, 740, 890, 890, 0.999),
-		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", 550, 740, 890, 890, 0.995),
-		BLESSINGS("Celestial Blessings", "Increases damage and resistance", "blessings.png", 550, 740, 890, 890, 0.9),
-		SHARPEYES("Sharp Eyes", "Increases critical rate and accuracy", "sharpeyes.png", 550, 740, 890, 890, 0.999),
-		FOCUSSEAL("Focus Seal", "Increases physical/magic attack", "focusseal.png", 550, 740, 890, 890, 0.9995),
-		WARHORN("Warhorn", "Increases physical/magic attack", "warhorn.png", 550, 740, 890, 890, 0.999),
-		HONINGRUNES("Honing Runes", "Increases critical damage", "honingrunes.png", 550, 740, 890, 890, 0.999),
-		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", 550, 740, 890, 890, 0.99),
-		DARKAURA("Dark Aura", "Increases spirit regen, stacking up to 10 times on hit", "darkaura.png", 550, 740, 890, 890, 0.99),
-		HOLY_SYMBOL("Holy Symbol", "Increases attack speed, accuracy, and damage", "holysymbol.png", 550, 740, 890, 890, 0.999),
-		VARR_WINGS("Varrekant's Wings", "Increases Piercing by 10%", "varrwings.png", "varrwings3.png", 550, 740, 890, 890, 0.99),
-		WEAPON_PROC("Weapon Proc", "Weapon proc effect - varies with equipment", "weaponbuff.png", 550, 740, 890, 890, 0.9999),
+		IRON_DEFENSE("Iron Defense", "Increases SP regen, and decreases damage taken and dealt", "irondefense.png", Resolution.BUFFS),
+		SHIELD_MASTERY("Shield Mastery", "Increases damage after a successful block", "shieldmastery.png", Resolution.BUFFS, 0.999),
+		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", Resolution.BUFFS, 0.995),
+		BLESSINGS("Celestial Blessings", "Increases damage and resistance", "blessings.png", Resolution.BUFFS, 0.9),
+		SHARPEYES("Sharp Eyes", "Increases critical rate and accuracy", "sharpeyes.png", Resolution.BUFFS, 0.999),
+		FATAL_STRIKES("Fatal Strikes", "All attacks deal critical damage", "fatalstrikes.png", Resolution.BUFFS, 0.999),
+		FOCUSSEAL("Focus Seal", "Increases physical/magic attack", "focusseal.png", Resolution.BUFFS, 0.9995),
+		WARHORN("Warhorn", "Increases physical/magic attack", "warhorn.png", Resolution.BUFFS, 0.999),
+		HONINGRUNES("Honing Runes", "Increases critical damage", "honingrunes.png", Resolution.BUFFS, 0.999),
+		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", Resolution.BUFFS, 0.99),
+		BRONZE_EAGLE("Bronze Eagle", "Increases Dexterity", "bronzeeagle.png", Resolution.BUFFS, 0.9995),
+		EAGLES_MAJESTY("Eagle's Majesty", "Restores SP per second, and Bronze Eagle deals additional damage on hit", "eaglesmajesty.png", Resolution.BUFFS, 0.999),
+		DARKAURA("Dark Aura", "Increases spirit regen, stacking up to 10 times on hit", "darkaura.png", Resolution.BUFFS, 0.99),
+		HOLY_SYMBOL("Holy Symbol", "Increases attack speed, accuracy, and damage", "holysymbol.png", Resolution.BUFFS, 0.999),
+		VARR_WINGS("Varrekant's Wings", "Increases Piercing by 10%", "varrwings.png", "varrwings3.png", Resolution.BUFFS, 0.99),
+		WEAPON_PROC("Weapon Proc", "Weapon proc effect - varies with equipment", "weaponbuff.png", Resolution.BUFFS, 0.9999),
 		
 		//misc
-		SPIRIT("SP Efficiency: ", "% of the time SP was under 100%", "spirit.png", 0.94),
-		HP("HP", "", 1099, 76, 1099 + 198, 76 + 29),
-		BOSS("HP", "", "boss.png", 643, 77, 685, 102),
+		SPIRIT("SP Efficiency: ", "% of the time SP was under 100%", "spirit.png", Resolution.SPIRIT, 0.94),
+		HP("HP", "", Resolution.BOSS_HEALTH),
+		BOSS("HP", "", "boss.png", Resolution.BOSS_TAG),
 		RAID_DPS("Raid DPS", "Average raid damage per second"),
 		TIME("Time", "Total ellasped time of the encounter and estimated clear time", "clock.png"),
 		HOLY_SYMBOL_DAMAGE("Holy Symbol Damage", "Estimated contribution of Holy Symbol", "holysymbol.png"),
@@ -95,69 +101,88 @@ public class MainDriver {
 		SHIELDTOSS_AMP("Damage Amplified: ", "0"), //are these redundant or what
 		STATIC_FLASH_AMP("Damage Amplified: ", "0"),
 		MOD_AMP("Damage Amplified: ", "0"),
-		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png"),
-		INFERNOG_BOMB("Infernog Blue Bomb", "Drops a puddle when the timer ends", "infernogbomb.png", 1000, 750, 1300, 900, 0.99),
-		BOSS_HEAL("Boss Healing", "Number of times the boss healed", "bossheal.png", 630, 0, 730, 55, 0.99),
-		SHIELD("Shield Uptime", "Reduces damage taken by 50%", "shield.png", 630, 0, 730, 55, 0.99),
-		SHIELD2("2x Shield Uptime", "Reduces damage taken by 80%", "doubleshield.png", 630, 0, 730, 55, 0.9),
+		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png", Resolution.DUNGEON_CLEAR),
+		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
+		INFERNOG_BOMB("Infernog Blue Bomb", "Drops a puddle when the timer ends", "infernogbomb.png", Resolution.DEBUFFS, 0.99),
+		BOSS_HEAL("Boss Healing", "Number of times the boss healed", "bossheal.png", Resolution.BOSS_BUFFS, 0.95),
+		SHIELD("Shield Uptime", "Reduces damage taken by 50%", "shield.png", Resolution.BOSS_BUFFS),
+		SHIELD2("2x Shield Uptime", "Reduces damage taken by 80%", "doubleshield.png", Resolution.BOSS_BUFFS),
 		DMG_MITIGATED("Damage Mitigated: ", "0");
+		
 		private String name, intro, image, secondaryImage = null;
 		private double threshold;
-		private int[] region;
-		private TrackPoint(String name, String intro, int x1, int y1, int x2, int y2) {
+		private int regionIndex;
+		private TrackPoint(String name, String intro, int regionIndex) {
+			this.regionIndex = regionIndex;
 			this.name = name;
 			this.intro = intro;
 			this.image = null;
-			this.region = new int[]{x1, y1, x2, y2};
 			this.threshold = 0.7;
 		}
 		private TrackPoint(String name, String intro) {
+			this.regionIndex = -1;
 			this.name = name;
 			this.intro = intro;
 			this.image = null;
-			this.region = null;
 			this.threshold = 0.7;
 		}
 		private TrackPoint(String name, String intro, String image) {
+			this.regionIndex = -1;
 			this.name = name;
 			this.intro = intro;
 			this.image = image;
-			this.region = null;
 			this.threshold = 0.7;
+		}
+		private TrackPoint(String name, String intro, String image, String secondaryImage) {
+			this.regionIndex = -1;
+			this.name = name;
+			this.intro = intro;
+			this.image = image;
+			this.secondaryImage = secondaryImage;
+			this.threshold = 0.7;
+		}
+		private TrackPoint(String name, String intro, String image, String secondaryImage, int regionIndex) {
+			this.regionIndex = -1;
+			this.name = name;
+			this.intro = intro;
+			this.image = image;
+			this.secondaryImage = secondaryImage;
+			this.threshold = 0.7;
+			this.regionIndex = regionIndex;
 		}
 		private TrackPoint(String name, String intro, String image, double threshold) {
+			this.regionIndex = -1;
 			this.name = name;
 			this.intro = intro;
 			this.image = image;
-			this.region = null;
 			this.threshold = threshold;
 		}
-		private TrackPoint(String name, String intro, String image, int x1, int y1, int x2, int y2) {
+		private TrackPoint(String name, String intro, String image, int regionIndex) {
+			this.regionIndex = regionIndex;
 			this.name = name;
 			this.intro = intro;
 			this.image = image;
-			this.region = new int[]{x1, y1, x2, y2};
 			this.threshold = 0.7;
 		}
-		private TrackPoint(String name, String intro, String image, String secondaryImage, int x1, int y1, int x2, int y2, double threshold) {
+		private TrackPoint(String name, String intro, String image, String secondaryImage, int regionIndex, double threshold) {
+			this.regionIndex = regionIndex;
 			this.name = name;
 			this.intro = intro;
 			this.image = image;
 			this.secondaryImage = image;
-			this.region = new int[]{x1, y1, x2, y2};
 			this.threshold = threshold;
 		}
-		private TrackPoint(String name, String intro, String image, int x1, int y1, int x2, int y2, double threshold) {
+		private TrackPoint(String name, String intro, String image, int resolutionIndex, double threshold) {
+			this.regionIndex = resolutionIndex;
 			this.name = name;
 			this.intro = intro;
 			this.image = image;
-			this.region = new int[]{x1, y1, x2, y2};
 			this.threshold = threshold;
 		}
-		private TrackPoint(String name, String image, int x1, int y1, int x2, int y2, double threshold) {
+		private TrackPoint(String name, String image, int resolutionIndex, double threshold) {
+			this.regionIndex = resolutionIndex;
 			this.name = name;
 			this.image = image;
-			this.region = new int[]{x1, y1, x2, y2};
 			this.threshold = threshold;
 		}
 		public String getName() {
@@ -199,14 +224,22 @@ public class MainDriver {
 			return sb.toString();
 		}
 		public boolean usesScreen() {
-			return region == null;
+			return regionIndex == -1;
+		}
+		public int getRegionIndex() {
+			return regionIndex;
 		}
 		public int[] getRegion() {
-			int[] toReturn = new int[4];
-			if (region == null)
+			if (regionIndex == -1) {
 				return null;
+			}
+			Integer[] region = resolution.getRegion(regionIndex);
+			int[] toReturn = new int[4];
 			for (int i = 0; i < region.length; i++) {
-				toReturn[i] = (int)(((double)region[i] / (i % 2 == 0 ? DEFAULT_WIDTH : DEFAULT_HEIGHT)) 
+				if (resolution.hasMatch())
+					toReturn[i] = region[i];
+				else
+					toReturn[i] = (int)(((double)region[i] / (i % 2 == 0 ? DEFAULT_WIDTH : DEFAULT_HEIGHT)) 
 					* (i % 2 == 0 ? screenSize.getWidth() : screenSize.getHeight()));
 			}
 			return toReturn;
@@ -221,6 +254,7 @@ public class MainDriver {
 	}
 
 	private static Overlay overlay = new Overlay();
+	private static Report report = new Report();
     
     public static final Color MAIN_COLOR = new Color(255, 209, 220);
 	public static Properties props;
@@ -306,6 +340,7 @@ public class MainDriver {
     }
     
     public static Map<TrackPoint, DataCollection> data;
+    public static Map<Integer, List<TrackPoint>> trackPointByRegion;
     
     public static void run() {
         long lastLoopTime = System.nanoTime();
@@ -338,6 +373,7 @@ public class MainDriver {
      */
     public static void initializeData() {
     	screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    	resolution = new Resolution(screenSize);
     	data = new TreeMap<TrackPoint, DataCollection>();
         data.put(TrackPoint.TIME, new TimeCollection());
         data.put(TrackPoint.HP, new DataCollection());
@@ -360,10 +396,13 @@ public class MainDriver {
         data.put(TrackPoint.IRON_DEFENSE, new HitMissCollection());
         data.put(TrackPoint.DARKAURA, new HitMissCollection());
         data.put(TrackPoint.SNIPE, new HitMissCollection());
+        data.put(TrackPoint.EAGLES_MAJESTY, new HitMissCollection());
+        data.put(TrackPoint.BRONZE_EAGLE, new HitMissCollection());
         data.put(TrackPoint.SMITE, new HitMissCollection());
         data.put(TrackPoint.WARHORN, new HitMissCollection());
         data.put(TrackPoint.HONINGRUNES, new HitMissCollection());
         data.put(TrackPoint.SHARPEYES, new HitMissCollection());
+        data.put(TrackPoint.FATAL_STRIKES, new HitMissCollection());
         data.put(TrackPoint.FOCUSSEAL, new HitMissCollection());
         data.put(TrackPoint.BLESSINGS, new HitMissCollection());
         data.put(TrackPoint.GUARDIAN, new HitMissCollection());
@@ -374,11 +413,26 @@ public class MainDriver {
         data.put(TrackPoint.HOLY_SYMBOL, new HitMissCollection());
         data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection());
         data.put(TrackPoint.DUNGEON_COMPLETE, new HitMissCollection());
+        data.put(TrackPoint.TOMBSTONE, new HitMissCollection());
         data.put(TrackPoint.VARR_WINGS, new HitMissCollection(Sound.PROC, 10));
         data.put(TrackPoint.INFERNOG_BOMB, new HitMissCollection(Sound.STATUS_WARNING, 11));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE, new DPSCollection((HitMissCollection)data.get(TrackPoint.HOLY_SYMBOL), 
             	(DeltaCollection)data.get(TrackPoint.RAID_DPS)));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW, new DeltaCollection(data.get(TrackPoint.HP), 1)); //assumes max level
+
+    	trackPointByRegion = new TreeMap<Integer, List<TrackPoint>>();
+    	for (TrackPoint tp : data.keySet()) {
+    		int region = tp.getRegionIndex();
+    		if (trackPointByRegion.get(region) == null) {
+    			List<TrackPoint> list = new ArrayList<TrackPoint>();
+    			list.add(tp);
+    			trackPointByRegion.put(region, list);
+    		} else {
+    			List<TrackPoint> list = trackPointByRegion.get(region);
+    			list.add(tp);
+    			trackPointByRegion.put(region, list);
+    		}
+    	}
     }
     
     /**
@@ -386,7 +440,7 @@ public class MainDriver {
      */
     public static void toggleMute() {
     	mute = !mute;
-    	Sound.PAUSE.play();
+    	Sound.SELECT.play();
     	props.setProperty("mute", Boolean.toString(mute));
     }
     
@@ -499,6 +553,8 @@ public class MainDriver {
     	
     }
     public static void tick() {
+        //double timeMultiplier = ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTimeMultiplier();
+        //System.out.println("Multiplier: "+timeMultiplier);
         Screen s = new Screen();
         int shields = 0;
         currentTick++;
@@ -507,11 +563,20 @@ public class MainDriver {
         	((DPSCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).calculateHSDamage();
         	((DPSCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).calculateAverageDamage();
         }
+        Map<Integer, Region> regionMap = new TreeMap<Integer, Region>();
+        for (Integer regionId : trackPointByRegion.keySet()) {
+        	List<TrackPoint> list = trackPointByRegion.get(regionId);
+			int[] region = list.get(0).getRegion();
+			if (region != null) {
+		        Region r = new Region(region[0], region[1], region[2] - region[0], region[3] - region[1]);
+		        regionMap.put(regionId, r);
+			}
+        }
     	for (TrackPoint tp : data.keySet()) {
     		DataCollection dc = data.get(tp);
     		String image = tp.getImage();
     		Match m;
-    		if (dc instanceof TimeCollection) {
+    		if (dc instanceof TimeCollection && active) {
     			((TimeCollection) dc).addData(System.currentTimeMillis());
     			continue;
     		}
@@ -520,8 +585,8 @@ public class MainDriver {
 	    		if (tp.usesScreen()) {
 	    			m = s.exists(image, 0.01);
 	    		} else {
-	    			int[] region = tp.getRegion();
-	    	        Region r = new Region(region[0], region[1], region[2] - region[0], region[3] - region[1]);
+	    			//int[] region = tp.getRegion();
+	    	        Region r = regionMap.get(tp.getRegionIndex()); //new Region(region[0], region[1], region[2] - region[0], region[3] - region[1]);
 	    			m = r.exists(image, 0.01);
 		    		if (m == null && tp.getSecondaryImage() != null) {
 		    			m = r.exists(tp.getSecondaryImage(), 0.01);
@@ -529,8 +594,6 @@ public class MainDriver {
 	    		}
 	    	
 				hit = m != null && m.getScore() >= tp.getThreshold();
-				//if (m != null && tp.getName().contains("ings"))
-				//	System.out.println(tp.getName()+": "+m.getScore());
 				if (tp.getName().contains("Dungeon Complete") && hit) {
 					pause();
 					break;

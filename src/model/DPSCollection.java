@@ -89,26 +89,31 @@ public class DPSCollection extends DataCollection {
 		hsTime = 0;
 		if (endPoints.size() > 0) {
 			for (int i = 0; i < endPoints.size(); i++) {
-				Integer[] endPointSet = endPoints.get(i);
-				BigInteger startDamage = new BigInteger(data.get(endPointSet[0]) + "");
-				BigInteger endDamage = new BigInteger(data.get(endPointSet[1]) + "");
-				if (i == endPoints.size() - 1)
-					lastHS = endPointSet[0];
-				BigInteger differential = endDamage.subtract(startDamage);
-				BigInteger comparison = findComparison(endPointSet);
-				hsTime += ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTime(endPointSet[0], endPointSet[1]);
-				System.out.println("Attempting to compare between: "+endPointSet[0]+", "+endPointSet[1]+". HS damage: "+endDamage.toString()+"-"+startDamage.toString());
-				if (comparison == null) //not enough data
-					return;
-				BigInteger result = differential.subtract(comparison);
-				BigInteger toAdd = differential.multiply(new BigInteger("19")).divide(new BigInteger("100")); 
-				if (result.compareTo(toAdd) > 0) {
-					total = total.add(result);
-				} else {
-					total = total.add(toAdd);
-					System.out.println("Adding pity points: "+toAdd.toString());
+				try {
+					Integer[] endPointSet = endPoints.get(i);
+					BigInteger startDamage = new BigInteger(data.get(endPointSet[0]) + "");
+					BigInteger endDamage = new BigInteger(data.get(endPointSet[1]) + "");
+					if (i == endPoints.size() - 1)
+						lastHS = endPointSet[0];
+					BigInteger differential = endDamage.subtract(startDamage);
+					BigInteger comparison = findComparison(endPointSet);
+					hsTime += ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTime(endPointSet[0], endPointSet[1]);
+					System.out.println("Attempting to compare between: "+endPointSet[0]+", "+endPointSet[1]+". HS damage: "+endDamage.toString()+"-"+startDamage.toString());
+					if (comparison == null) //not enough data
+						return;
+					BigInteger result = differential.subtract(comparison);
+					BigInteger toAdd = differential.multiply(new BigInteger("19")).divide(new BigInteger("100")); 
+					if (result.compareTo(toAdd) > 0) {
+						total = total.add(result);
+					} else {
+						total = total.add(toAdd);
+						System.out.println("Adding pity points: "+toAdd.toString());
+					}
+					System.out.println("HS Damage: "+differential+". Comparison Damage: "+comparison+".");
+				} catch (Exception e) {
+					e.printStackTrace();
+					continue;
 				}
-				System.out.println("HS Damage: "+differential+". Comparison Damage: "+comparison+".");
 			}
 		}
 		addData(total.toString());
