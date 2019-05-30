@@ -280,11 +280,13 @@ public class DeltaCollection extends DataCollection {
 		DeltaCollection csColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.CYCLONE_SHIELD_AMP));
 		DeltaCollection plColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP));
 		DeltaCollection birdColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SOUL_FLOCK_AMP));
+		DeltaCollection arielColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.ARIELS_WINGS_AMP));
 		DeltaCollection[] defDebuff = {
-			sfColl, stColl, csColl, plColl, birdColl
+			sfColl, stColl, csColl, plColl, birdColl, arielColl
 		};
 		TrackPoint[] defDebuffTp = {
-			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD, TrackPoint.PURIFYING_LIGHT, TrackPoint.SOUL_FLOCK
+			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD, TrackPoint.PURIFYING_LIGHT, TrackPoint.SOUL_FLOCK,
+			TrackPoint.ARIELS_WINGS
 		};
 
 		index--; //collections have 1 less entry than hp

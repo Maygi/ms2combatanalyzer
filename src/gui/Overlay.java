@@ -89,11 +89,12 @@ public class Overlay extends AbstractLabel {
     };
     
     private static final TrackPoint[] DEBUFFS = {
+    	TrackPoint.ARIELS_WINGS,
     	TrackPoint.SMITE, TrackPoint.PURIFYING_LIGHT, 
     	TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD,
     	TrackPoint.MOD, 
     	TrackPoint.SOUL_FLOCK, TrackPoint.STATIC_FLASH, 
-    	TrackPoint.SOUL_DISSONANCE, TrackPoint.RAGING_TEMPEST
+    	TrackPoint.SOUL_DISSONANCE, TrackPoint.RAGING_TEMPEST,
     };
     
     private static final TrackPoint[] MISC = {
@@ -201,6 +202,9 @@ public class Overlay extends AbstractLabel {
         if (!MainDriver.active) {
             drawFilm(theGraphics, Color.GRAY);
         }
+    	BigDecimal currentVersion = new BigDecimal(MainDriver.VERSION);
+    	BigDecimal liveVersion = new BigDecimal(MainDriver.liveVersion);
+    	boolean newVersion = (currentVersion.compareTo(liveVersion) < 0);
         if (MainDriver.started) {
 	        drawText(g2d, "Party Stats", FONT_SIZE, MARGIN,
 	                (int) (getSize().getHeight() * TEXT_PERCENT), 1,
@@ -329,6 +333,22 @@ public class Overlay extends AbstractLabel {
 					sb.append(" | ");
 					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.STATIC_FLASH_AMP).getLast())));
 				}
+				if (DEBUFFS[i].getName().contains("Soul Flock")) {
+					sb.append(" | ");
+					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.SOUL_FLOCK_AMP).getLast())));
+				}
+				if (DEBUFFS[i].getName().contains("Purifying Light")) {
+					sb.append(" | ");
+					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP).getLast())));
+				}
+				if (DEBUFFS[i].getName().contains("Cyclone Shield")) {
+					sb.append(" | ");
+					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.CYCLONE_SHIELD_AMP).getLast())));
+				}
+				if (DEBUFFS[i].getName().contains("Ariel's Wings")) {
+					sb.append(" | ");
+					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.ARIELS_WINGS_AMP).getLast())));
+				}
 				text = sb.toString();
 				line++;
 		        drawNormalText(g2d, text, FONT_SIZE, 24 + MARGIN * 2 + (int)((GAP * 1.6)),
@@ -357,16 +377,28 @@ public class Overlay extends AbstractLabel {
 	            addTooltip(MISC[i], x, y);
 	        }
         } else {
-        	if (!MainDriver.VERSION.equals(MainDriver.liveVersion))  {
-		        drawText(g2d, "New build available!", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
-		                (int) (getSize().getHeight() * 0.3), 1,
-		                Color.WHITE, SHADOW_COLOR.darker());
-		        drawNormalTextCentered(g2d, "Click the red \"!\" button to download it!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
-		                (int) (getSize().getHeight() * 0.55), 1,
-		                Color.WHITE, SHADOW_COLOR.darker());
-        		
-        	} else {
-		        drawText(g2d, "Waiting for data...", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
+        	try {
+	        	if (newVersion) {
+			        drawText(g2d, "New build available!", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
+			                (int) (getSize().getHeight() * 0.3), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+			        drawNormalTextCentered(g2d, "Click the red \"!\" button to download it!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+			                (int) (getSize().getHeight() * 0.55), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+	        		
+	        	} else {
+			        drawText(g2d, "Waiting for data...", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
+			                (int) (getSize().getHeight() * 0.3), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+			        drawNormalTextCentered(g2d, "Enter combat with a boss to begin!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+			                (int) (getSize().getHeight() * 0.55), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+			        drawNormalTextCentered(g2d, "(make sure UI size is set to 50%)", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+			                (int) (getSize().getHeight() * 0.7), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+	        	}
+        	} catch (Exception e) {
+		        drawText(g2d, "Unable to check versions.", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
 		                (int) (getSize().getHeight() * 0.3), 1,
 		                Color.WHITE, SHADOW_COLOR.darker());
 		        drawNormalTextCentered(g2d, "Enter combat with a boss to begin!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
@@ -416,7 +448,7 @@ public class Overlay extends AbstractLabel {
         }
         for (final GuiButton b : BUTTONS) {
         	if (b.getImage().contains("update")) {
-        		if (MainDriver.started || MainDriver.VERSION.equals(MainDriver.liveVersion))
+        		if (MainDriver.started || !newVersion)
         			continue;
         	}
         	b.handleDraw(this, theGraphics);

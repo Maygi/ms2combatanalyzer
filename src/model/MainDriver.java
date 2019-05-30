@@ -28,12 +28,12 @@ import util.VersionCheck;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.3
+ * Version 1.31
  * @author May
  */
 public class MainDriver {
 	
-	public static final String VERSION = "1.3";
+	public static final String VERSION = "1.31";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -120,6 +120,7 @@ public class MainDriver {
 		VISION_TORRENT("Vision Torrent", "Increases magic attack and enhances skills", "visiontorrent.png", Resolution.BUFFS, 0.999, ClassConstants.SOUL_BINDER),
 		
 		//priest awakening
+		ARIELS_WINGS("Ariel's Wings", "Decreases defense of target", "arielswings.png", Resolution.BOSS_DEBUFFS, 0.999),
 		PURIFYING_LIGHT("Purifying Light", "Decreases defense of target", "purifyinglight.png", Resolution.BOSS_DEBUFFS, 0.999),
 		VITALITY("Vitality", "Increased physical and magic attack", "vitality.png", Resolution.BUFFS, 0.999),
 		GREATER_HEAL("Greater Heal", "Restoring health over time. 50% of this uptime is a damage buff", "greaterheal.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
@@ -171,6 +172,7 @@ public class MainDriver {
 		CYCLONE_SHIELD_AMP("Damage Amplified: ", "0"),
 		PURIFYING_LIGHT_AMP("Damage Amplified: ", "0"),
 		SOUL_FLOCK_AMP("Damage Amplified: ", "0"),
+		ARIELS_WINGS_AMP("Damage Amplified: ", "0"),
 		MOD_AMP("Damage Amplified: ", "0"),
 		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png", Resolution.DUNGEON_CLEAR),
 		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "dead.png", Resolution.TOMBSTONE, 0.99),
@@ -532,6 +534,8 @@ public class MainDriver {
         data.put(TrackPoint.DIVINE_RETRIBUTION, new HitMissCollection());
         
         //priest awakening
+        data.put(TrackPoint.ARIELS_WINGS, new HitMissCollection(TrackPoint.ARIELS_WINGS_AMP));
+        data.put(TrackPoint.ARIELS_WINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.05, DeltaCollection.DEFENSE_DEBUFF));
         data.put(TrackPoint.PURIFYING_LIGHT, new HitMissCollection(TrackPoint.PURIFYING_LIGHT_AMP));
         data.put(TrackPoint.PURIFYING_LIGHT_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.06, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.HEAVENS_WRATH, new HitMissCollection());
