@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -17,7 +16,10 @@ public enum GuiButton {
 	PERSONAL(30, 400 + 24, "images/ui/button.png", "Personal"),
 	BUFFS(30, 435 + 24, "images/ui/button.png", "Buffs"),
 	DEBUFFS(30, 470 + 24, "images/ui/button.png", "Debuffs"),
-	
+	UP(30 + 170 - 20 + 800, 435 + 24, "images/ui/up_arrow.png"),
+	DOWN(30 + 170 - 20 + 800, 435 + 24 + 19, "images/ui/down_arrow.png"),
+
+	UPDATE(375, 12, "images/ui/update.png"),
 	MUTE(400, 12, "images/ui/mute.png"),
 	PAUSE(425, 12, "images/ui/pause.png"),
 	RESET(450, 12, "images/ui/reset.png"),
@@ -25,6 +27,8 @@ public enum GuiButton {
 	CLOSE(475, 12, "images/ui/close.png");
 	
 	private static final int FONT_SIZE = 20;
+	
+	private boolean active = true;
 	
 	private int x, y;
 	private String image, text;
@@ -49,6 +53,9 @@ public enum GuiButton {
 	public String getImage() {
 		return image;
 	}
+	public boolean isActive() {
+		return active;
+	}
 	public int getWidth() {
 		BufferedImage bimg;
 		try {
@@ -71,14 +78,23 @@ public enum GuiButton {
     	int[] coords = getCoords();
         label.drawImage(theGraphics, getImage(), coords[0],  coords[1]);
         Point p = MouseInfo.getPointerInfo().getLocation();
-        boolean active = true;
+        active = true;
         if (getImage().contains("pause") && !MainDriver.active)
         	active = false;
         if (getImage().contains("mute") && MainDriver.mute)
         	active = false;
-        if (getText().length() > 0) {
-        	if (!((Graph)label).currentTab.equalsIgnoreCase(getText()))
+        if (getImage().contains("up_arrow")) {
+        	if (!((Graph)label).hasPreviousPage())
         		active = false;
+        }
+        if (getImage().contains("down_arrow")) {
+        	if (!((Graph)label).hasNextPage())
+        		active = false;
+        }
+        if (getText().length() > 0) {
+        	if (!((Graph)label).currentTab.equalsIgnoreCase(getText())) {
+        		active = false;
+        	}
         }
         if (p != null) {
         	Point diff = label.getLocationOnScreen();

@@ -23,7 +23,8 @@ public enum Sound {
     SELECT("select"),
     STATUS_WARNING("statusalert"),
     HOVER("hover"),
-    PROC("proc");
+    PROC("proc"),
+    PROC2("proc2");
     
     /**
      * A clip to play the sound effect.

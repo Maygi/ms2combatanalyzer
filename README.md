@@ -37,30 +37,32 @@ Scroll to the bottom for some common mistakes that people make~
   * Party buffs (Celestial Blessings, Focus Seal, etc)
   * Party debuffs (Smiting Aura, Shield Toss, etc)
 * Estimates damage contribution
-  * Smiting Aura
-  * Shield Toss
+  * Smiting Aura / Purifying Light
+  * Shield Toss / Cyclone Shield
+  * Static Flash / Soul Flock
   * Mark of Death
-  * Static Flash
   * Holy Symbol
 * Sound triggers
+  * Reaching max stacks of Flame Arrow, Wind Draw
+  * Resetting cooldown of BBQ Party
+  * Gaining instant 3rd hit of Skull Splitter
   * Varrekant's wings
+  * Weapon proc
   * Blue bomb debuff in Wrath of Infernog
 
 # Notes
 * All calculations are estimates! They may not be 100% accurate.
-* Current debuff contribution calculations calculate contribution as if all debuffs stack multiplicatively
- with each other, when Smite/MOD and Static Flash/Shield Toss do not
+* As of 5/29/19, debuff calculations follow a complex formula and are much more accurate than before.
 * Holy Symbol contribution calculation is a work in progress and may be even more inaccurate. As such, I've provided a metric for the total damage dealt under Holy Symbol as well
 * If you cast Holy Symbol within the first minute or so, the Holy Symbol damage contribution won't appear for another minute. This is intended; the program needs to see around one minute of combat without Holy Symbol to estimate how much damage the party is doing normally
 * Pausing when in combat with a boss won't do anything, because it'll automatically start up instantly. Pause is only useful for when the encounter is finished, or you leave early.
 
 # Upcoming Features
-* Add an option for toggling sound triggers
+* Add an option pane for customizing and toggling sound triggers
+
+# Upcoming (soon TM) Features
+* Networking with other MSCA users in your party to come up with even more advanced information (e.g. "That last blessings only hit 7/10 party members!")
 * Add an option to change the UI color (I'm sure not everyone likes pink as much as I do...)
-* Save the UI's position in the screen so it launches in the same place when reloading
-* Improve calculations
-* Add a feature for estimating the clear time
-* other stuffs... we'll see :3 
 
 # HELP! IT'S NOT WORKING!
 

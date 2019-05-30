@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import model.MainDriver.TrackPoint;
 import sound.Sound;
 
 /**
@@ -15,6 +16,7 @@ public class HitMissCollection extends DataCollection {
 	private int soundDelay;
 	private long lastSound = 0;
 	protected List<Boolean> rawData;
+	private boolean canPlaySound;
 	
 	/**
 	 * The index of the last successful hit; -1 if none.
@@ -35,6 +37,8 @@ public class HitMissCollection extends DataCollection {
 	 */
 	private boolean countFlag;
 	
+	private TrackPoint tp = null;
+	
 	/**
 	 * Standard constructor for a HitMissCollection.
 	 */
@@ -46,6 +50,23 @@ public class HitMissCollection extends DataCollection {
 		hits = misses = 0;
 		sound = null;
 		soundDelay = 0;
+		canPlaySound = true;
+	}
+	
+	/**
+	 * A constructor for a HitMissCollection that is tied to a damage amp TrackPoint.
+	 * @param tp The TrackPoint for the associated damage amp collection.
+	 */
+	public HitMissCollection(TrackPoint tp) {
+		super();
+		rawData = new ArrayList<Boolean>();
+		endPoints = new ArrayList<Integer[]>();
+		countFlag = false;
+		hits = misses = 0;
+		sound = null;
+		soundDelay = 0;
+		canPlaySound = true;
+		this.tp = tp;
 	}
 	
 	/**
@@ -60,6 +81,10 @@ public class HitMissCollection extends DataCollection {
 		hits = misses = 0;
 		this.sound = sound;
 		this.soundDelay = delay;
+	}
+	
+	public TrackPoint getTrackPoint() {
+		return tp;
 	}
 	
 	/**
@@ -118,15 +143,18 @@ public class HitMissCollection extends DataCollection {
 			return;
 		if (hit) {
 			hits++;
-			if (sound != null) {
+			if (canPlaySound && sound != null) {
 				final long time = System.currentTimeMillis();
 				if (Math.abs(time - lastSound) / 1000 > soundDelay) {
 					sound.play();
 					lastSound = time; 
+					canPlaySound = true;
 				}
 			}
-		} else
+		} else {
 			misses++;
+			canPlaySound = true;
+		}
 		addData(calculatePercentage());
 		addRawData(hit);
 	}

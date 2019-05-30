@@ -14,29 +14,29 @@ import javax.swing.SpringLayout;
 import model.MainDriver;
 import sound.Sound;
 
-public class Report extends AbstractFrame {
-
-	private static final long serialVersionUID = -7733102550830427917L;
+public class OptionsFrame extends AbstractFrame {
+	
+	private static final long serialVersionUID = 3067281801758591724L;
 	
 	private final SpringLayout myLayout;
 	private int x;
     private int y;
     
-    private Graph myGraph;
+    private Options myOptions;
     private boolean hover = false;
     
-    public Report() {
-        super("Fight Report");
+    public OptionsFrame() {
+        super("Options");
         //setIconImage((new ImageIcon("images/ui/avi.gif")).getImage());
         setPreferredSize(getPreferredSize());
         setMinimumSize(getPreferredSize());
         myLayout = new SpringLayout();
-        myGraph = new Graph(this, 1, 1);
+        myOptions = new Options(this, 1, 1);
     }
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(1200, 600);
+        return new Dimension(600, 600);
     }
     
     public void start() {
@@ -64,10 +64,7 @@ public class Report extends AbstractFrame {
 	            	int[] coords = b.getCoords();
 	                if (x >= coords[0] && x <= coords[0] +  b.getWidth()  &&
 	                		y >= coords[1] && y <= coords[1] + b.getHeight()) {
-	                	if (!myGraph.currentTab.equalsIgnoreCase(b.getText()))
-	                		Sound.SELECT.play();	 
-	                	myGraph.currentTab = b.getText();
-	                	myGraph.repaint();
+	                		
 	                	resetTooltips();
 	                }
 	            }
@@ -91,7 +88,7 @@ public class Report extends AbstractFrame {
 	                    		Sound.HOVER.play();	                    		
 	                    	}
 	                	}
-	                	myGraph.repaint();
+	                	myOptions.repaint();
 	                	hover = true;
 	                	hit = true;
 	                }
@@ -102,7 +99,7 @@ public class Report extends AbstractFrame {
 	                	if (!hover) {
 	                    	Sound.HOVER.play();
 	                	}
-	                	myGraph.repaint();
+	                	myOptions.repaint();
 	                	hover = true;
 	                	hit = true;
 	                	break;
@@ -111,7 +108,7 @@ public class Report extends AbstractFrame {
 	            if (!hit) {
 	            	hover = false;
 	            	if (hoveredTooltip == null)
-	                	myGraph.repaint();
+	                	myOptions.repaint();
 	            }
         	}
             public void mouseDragged(MouseEvent evt) {
@@ -131,11 +128,11 @@ public class Report extends AbstractFrame {
         final Container container = getContentPane();
 
         container.setBackground(new Color(255, 248, 250));
-        myLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, myGraph, 0, 
+        myLayout.putConstraint(SpringLayout.HORIZONTAL_CENTER, myOptions, 0, 
                                SpringLayout.HORIZONTAL_CENTER,
                                container);
-        myLayout.putConstraint(SpringLayout.VERTICAL_CENTER, myGraph, 0,
+        myLayout.putConstraint(SpringLayout.VERTICAL_CENTER, myOptions, 0,
                              SpringLayout.VERTICAL_CENTER, container);
-        add(myGraph);
+        add(myOptions);
     }
 }

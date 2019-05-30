@@ -1,9 +1,12 @@
 package model;
 
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import model.MainDriver.TrackPoint;
 
 /**
  * This is a DataCollection that counts up a portion (multiplier) of data based on the
@@ -11,28 +14,53 @@ import java.util.List;
  * @author May
  */
 public class DeltaCollection extends DataCollection {
+	
+	public static final int DAMAGE_AMP = 0;
+	public static final int DEFENSE_DEBUFF = 1;
+	public static final int OTHER = 2;
+	
+	/**
+	 * Readings of the last, and second last HP values.
+	 */
+	private static BigInteger last, secondLast;
+	
+	/**
+	 * Whether or not data should be updated on this tick.
+	 */
+	private static boolean addData;
+	
 	/**
 	 * The data collection to mirror
 	 */
 	private DataCollection data;
 	
-	private List<Integer> dataOverTime;
+	private List<BigInteger> dataOverTime;
 	
 	/**
 	 * Data accumulates. Deltas give us the value per tick.
 	 */
-	private List<Integer> deltas;
+	private List<BigInteger> deltas;
 	
 	/**
 	 * These delta arrays return the average of the last X deltas, based on the delta constant.
 	 */
-	private List<Integer> softDeltas;
+	private List<BigInteger> softDeltas;
 	
 	private static final int DELTA_CONSTANT = 5;
 	
 	private double multiplier;
 	
-	private int total;
+	private BigInteger total;
+	
+	/**
+	 * The type of debuff.
+	 */
+	private int type;
+	
+	/**
+	 * A temporary flag, to be used in post-tick calculations, of the hit.
+	 */
+	private boolean flag = false;
 	
 	/**
 	 * The amount of "inaccurate" readings that occured.
@@ -42,15 +70,16 @@ public class DeltaCollection extends DataCollection {
 	 */
 	private int breaks;
 	
-	public DeltaCollection(DataCollection data, double multiplier) {
+	public DeltaCollection(DataCollection data, double multiplier, int type) {
 		super();
 		this.data = data;
 		this.multiplier = multiplier;
-		this.total = 0;
+		this.type = type;
+		this.total = BigInteger.ZERO;
 		this.breaks = 0;
-		this.dataOverTime = new ArrayList<Integer>();
-		this.deltas = new ArrayList<Integer>();
-		this.softDeltas = new ArrayList<Integer>();
+		this.dataOverTime = new ArrayList<BigInteger>();
+		this.deltas = new ArrayList<BigInteger>();
+		this.softDeltas = new ArrayList<BigInteger>();
 	}
 	
 	public double getMultiplier() {
@@ -61,37 +90,114 @@ public class DeltaCollection extends DataCollection {
 	 * Returns the last (valid) delta behind the given index.
 	 * @return
 	 */
-	public int getLastDelta(int index) {
+	public BigInteger getLastDelta(int index) {
 		if (index > data.getData().size())
-			return 0;
-		List<Integer> realData = data.getData();
-		int last = -1;
+			return BigInteger.ZERO;
+		List<BigInteger> realData = data.getData();
 		int indexToRead = index;
-		int reference = 0;
+		BigInteger reference = BigInteger.ZERO;
 		while (indexToRead > 0) { //find the last successful reading
 			indexToRead--;
-			int value = realData.get(index);
-			if (value < 0) //if failed to read
+			BigInteger value = realData.get(index);
+			if (value.compareTo(BigInteger.ZERO) < 0) //if failed to read
 				continue;
 			else {
 				reference = value;
 				break;
 			}
 		}
-		return realData.get(index) - reference;
+		return realData.get(index).subtract(reference);
 	}
 
 	
-	public List<Integer> getDataOverTime() {
+	public List<BigInteger> getDataOverTime() {
 		return dataOverTime;
 	}
 	
-	public List<Integer> getDeltas() {
+	public List<BigInteger> getDeltas() {
 		return deltas;
 	}
 	
-	public List<Integer> getSoftDeltas() {
+	public List<BigInteger> getSoftDeltas() {
 		return softDeltas;
+	}
+	
+	/**
+	 * Handles pre-processing.
+	 * To be called before post-processing, but after raid damage processing.
+	 */
+	public static void preProcess() {
+		addData = true;
+		List<BigInteger> realData = MainDriver.data.get(TrackPoint.HP).getData();
+		last = new BigInteger("-1");
+		secondLast = new BigInteger("-1");
+		BigInteger lastValid = null;
+		int index = realData.size() - 2;
+		if (realData.size() < 2)
+			addData = false;
+		else {
+			last = realData.get(realData.size() - 1);
+			secondLast = realData.get(index);
+			lastValid = last;
+		}
+		if (secondLast == null || last == null)
+			addData = false;
+		else {
+			for (int i = realData.size() - 1; i > Math.max(realData.size() - 5, 0); i--) {
+				if (lastValid == null && last == null && realData.get(i) != null)
+					lastValid = realData.get(i);		
+				if (lastValid == null)
+					continue;					
+				BigInteger integrityCheck = realData.get(i);
+				if (integrityCheck == null)
+					continue;
+				if (integrityCheck.subtract(lastValid).abs().compareTo(lastValid) > 0) {
+					addData = false;
+					break;
+				}
+				
+			}
+			if (last.compareTo(BigInteger.ZERO) < 0 || secondLast.compareTo(BigInteger.ZERO) < 0) //if failed to read either
+				addData = false;
+			if (secondLast.subtract(last).compareTo(BigInteger.ZERO) < 0) //it healed - can't count it
+				addData = false;
+			if (secondLast.subtract(last).compareTo(last) > 0) //probably counted an extra digit...
+				addData = false;
+		}
+		while (!addData && index > 0 && (last == null || last.compareTo(BigInteger.ZERO) > 0)) { //find the last successful reading
+			index--;
+			secondLast = realData.get(index);
+			if (secondLast == null || last == null)
+				addData = false;
+			else if (last.compareTo(BigInteger.ZERO) < 0 || secondLast.compareTo(BigInteger.ZERO) < 0) //if failed to read either
+				addData = false;
+			else if (secondLast.subtract(last).compareTo(BigInteger.ZERO) < 0) //it healed - can't count it
+				addData = false;
+			else if (secondLast.subtract(last).compareTo(last) > 0) //probably counted an extra digit...
+				addData = false;
+			else if (secondLast.subtract(last).compareTo(last) > 0) //probably counted an extra digit...
+				addData = false;
+			else if (realData.size() > 10) {
+				boolean flag = false;
+				for (int i = realData.size() - 1; i > Math.max(realData.size() - 5, 0); i--) {
+					if (lastValid == null && last == null && realData.get(i) != null)
+						lastValid = realData.get(i);
+					if (lastValid == null)
+						continue;
+					BigInteger integrityCheck = realData.get(i);
+					if (integrityCheck == null)
+						continue;
+					if (integrityCheck.subtract(last).abs().compareTo(last) > 0) {
+						addData = false;
+						flag = true;
+						break;
+					}
+				}
+				if (!flag)
+					addData = true;
+			} else
+				addData = true;
+		}
 	}
 	
 	/**
@@ -99,18 +205,22 @@ public class DeltaCollection extends DataCollection {
 	 * @param addData Whether or not the reading was valid.
 	 * @param value The value to add
 	 */
-	public void updateDelta(boolean addData, int value) {
+	public void updateDelta(boolean addData, BigInteger value) {
 		if (!addData) {
 			breaks++;
+			MainDriver.logOutput.println("Update Delta. Bad reading. Breaks: "+breaks);
 			return;
 		}
 		if (breaks > 0) {
-			value /= breaks;
+			MainDriver.logOutput.println("Update Delta. There are breaks: "+breaks+"; dividing value, which is "+value.toString());
+			value = value.divide(new BigInteger(Integer.toString(breaks)));
 			for (int i = 0; i < breaks; i++) {
 				deltas.add(value);
+				MainDriver.logOutput.println("Update Delta. Adding value: "+value);
 			}
 		} else {
 			deltas.add(value);
+			MainDriver.logOutput.println("Update Delta. Adding value: "+value);
 		}
 	}
 	
@@ -122,62 +232,120 @@ public class DeltaCollection extends DataCollection {
 		if (!toAdd) {
 			return;
 		}
-		int total = 0;
+		BigInteger total = BigInteger.ZERO;
 		int start = deltas.size() - 1;
 		int end = Math.max(0,  deltas.size() - 1 - DELTA_CONSTANT);
 		int count = 0;
 		for (int i = start; i >= end; i--) {
-			total += deltas.get(i);
+			total = total.add(deltas.get(i));
 			count++;
 		}
-		if (count == 0)
+		if (count == 0) {
+			MainDriver.logOutput.println("Updating soft delta with count0: "+(deltas.get(deltas.size() - 1)));
 			softDeltas.add(deltas.get(deltas.size() - 1));
-		else {
-			total /= count;
+		} else {
+			total = total.divide(new BigInteger(Integer.toString(count)));
+			MainDriver.logOutput.println("Updating soft delta with: "+total);
 			softDeltas.add(total);
 		}
 		if (breaks > 0) {
+			MainDriver.logOutput.println("Breaks: "+breaks);
 			breaks--;
 			updateSoftDelta(toAdd);
 		}
 	}
+	
+	/**
+	 * Final process that calculates debuff contributions.
+	 */
+	public static void finalProcess() {
+		if (!addData)
+			return;
+		BigInteger rawDamage = secondLast.subtract(last);
+		List<BigInteger> realData = MainDriver.data.get(TrackPoint.HP).getData();
+		
+		int index = realData.size() - 1;
+		
+		DeltaCollection smiteColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SMITE_AMP));
+		DeltaCollection modColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.MOD_AMP));
+		DeltaCollection[] damageAmp = {
+			smiteColl, modColl	
+		};
+		TrackPoint[] damageAmpTp = {
+			TrackPoint.SMITE, TrackPoint.MOD
+		};
 
-	public void handleHit(boolean hit, double multiplier) {
+		DeltaCollection sfColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.STATIC_FLASH_AMP));
+		DeltaCollection stColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SHIELDTOSS_AMP));
+		DeltaCollection csColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.CYCLONE_SHIELD_AMP));
+		DeltaCollection plColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP));
+		DeltaCollection birdColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SOUL_FLOCK_AMP));
+		DeltaCollection[] defDebuff = {
+			sfColl, stColl, csColl, plColl, birdColl
+		};
+		TrackPoint[] defDebuffTp = {
+			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD, TrackPoint.PURIFYING_LIGHT, TrackPoint.SOUL_FLOCK
+		};
+
+		index--; //collections have 1 less entry than hp
+		//calculate pre-damage amp value
+		double totalAmp = 1;
+		for (int i = 0; i < damageAmp.length; i++) {
+			boolean hit = ((HitMissCollection)(MainDriver.data.get(damageAmpTp[i]))).getRawData().get(index);
+			totalAmp += hit ? damageAmp[i].getMultiplier() : 0;
+		}
+		BigDecimal preAmp = new BigDecimal(rawDamage.doubleValue()).divide(new BigDecimal(totalAmp), 2, RoundingMode.HALF_UP);
+
+		//use pre-damage amp value to calculate pre-defense debuff value
+		double defFactor = 0;
+		for (int i = 0; i < defDebuff.length; i++) {
+			boolean hit = ((HitMissCollection)(MainDriver.data.get(defDebuffTp[i]))).getRawData().get(index);
+			defFactor += hit ? defDebuff[i].getMultiplier() : 0;
+		}
+		double totalDefAmp = 1 / (1 - defFactor);
+		BigDecimal preDefAmp = preAmp.divide(new BigDecimal(totalDefAmp), 2, RoundingMode.HALF_UP);
+
+		System.out.println("Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
+		BigDecimal totalDebuff = BigDecimal.ZERO;
+		for (int i = 0; i < defDebuffTp.length; i++) {
+			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%)
+			boolean hit = ((HitMissCollection)(MainDriver.data.get(defDebuffTp[i]))).getRawData().get(index);
+			if (!hit)
+				continue;			
+			double totalDefPortion = defFactor == 0 ? 0 : defDebuff[i].getMultiplier() / defFactor;
+			BigDecimal contribution = preAmp.subtract(preDefAmp).multiply(new BigDecimal(totalDefPortion));
+			System.out.println(defDebuffTp[i].getName()+" - Total def debuff: "+defFactor+": portion: "+totalDefPortion+"; contribution: "+contribution.toString());
+			defDebuff[i].addDataFinal(contribution);
+			totalDebuff = totalDebuff.add(contribution);
+		}
+		for (int i = 0; i < damageAmpTp.length; i++) {
+			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%))
+			boolean hit = ((HitMissCollection)(MainDriver.data.get(damageAmpTp[i]))).getRawData().get(index);
+			if (!hit)
+				continue;			
+			BigDecimal contribution = preDefAmp.multiply(new BigDecimal(damageAmp[i].getMultiplier()));
+			System.out.println(damageAmpTp[i].getName()+" - contribution: "+contribution.toString());
+			damageAmp[i].addDataFinal(contribution);
+			totalDebuff = totalDebuff.add(contribution);
+		}
+		BigInteger synergy = rawDamage.subtract(preDefAmp.toBigInteger()).subtract(totalDebuff.toBigInteger());
+		System.out.println("SYNERGY: "+synergy.toString());
+	}
+	
+	public void addDataFinal(BigDecimal value) {
+		System.out.println("ADDING: "+value.toString());
+		total = total.add(value.toBigInteger());
+		addData(total);
+	}
+	
+	public void postProcess() {
 		if (!MainDriver.active)
 			return;
-		if (hit) {
-			boolean addData = true;
-			List<Integer> realData = data.getData();
-			//System.out.println("HIT! Data: "+realData.toString());
-			int last = -1, secondLast = -1;
-			int index = realData.size() - 2;
-			if (realData.size() < 2)
-				addData = false;
-			else {
-				last = realData.get(realData.size() - 1);
-				secondLast = realData.get(index);
-			}
-			if (last < 0 || secondLast < 0) //if failed to read either
-				addData = false;
-			if (secondLast - last < 0) //it healed - can't count it
-				addData = false;
-			if (secondLast - last > last) //probably counted an extra digit...
-				addData = false;
-			while (!addData && index > 0 && last > 0) { //find the last successful reading
-				index--;
-				secondLast = realData.get(index);
-				if (last < 0 || secondLast < 0) //if failed to read either
-					addData = false;
-				else if (secondLast - last < 0) //it healed - can't count it
-					addData = false;
-				else if (secondLast - last > last) //probably counted an extra digit...
-					addData = false;
-				else
-					addData = true;
-			}
-			int toAdd = (int)(multiplier * (secondLast - last));
+		if (flag || type == OTHER) {
+			BigDecimal decimal = addData ? new BigDecimal((secondLast.subtract(last).toString())) : BigDecimal.ZERO;
+			BigInteger toAdd = addData ? new BigInteger(Integer.toString(decimal.multiply(new BigDecimal(multiplier)).intValue())) : BigInteger.ZERO;
 			if (addData) {
-				total += toAdd;
+				total = total.add(toAdd);
 			}/* else {
 				deltas.add(deltas.size() == 0 ? 0 : deltas.get(deltas.size() - 1));
 			}*/
@@ -185,7 +353,18 @@ public class DeltaCollection extends DataCollection {
 			updateSoftDelta(addData);
 			addData(total);
 			if (MainDriver.getEllaspedTime() > 0)
-				dataOverTime.add(total / MainDriver.getEllaspedTime());
+				dataOverTime.add(total.divide(new BigInteger(Integer.toString(MainDriver.getEllaspedTime()))));
+		}
+		flag = false;
+	}
+
+	public void handleHit(boolean hit, double multiplier) {
+		if (!MainDriver.active)
+			return;
+		if (hit) {
+			flag = true;
+		} else {
+			flag = false;
 		}
 	}
 	public void handleHit(boolean hit) {
@@ -194,9 +373,9 @@ public class DeltaCollection extends DataCollection {
 	@Override
 	public void reset() {
 		super.reset();
-		total = 0;
-		dataOverTime = new ArrayList<Integer>();
-		deltas = new ArrayList<Integer>();
-		softDeltas = new ArrayList<Integer>();
+		total = BigInteger.ZERO;
+		dataOverTime = new ArrayList<BigInteger>();
+		deltas = new ArrayList<BigInteger>();
+		softDeltas = new ArrayList<BigInteger>();
 	}
 }

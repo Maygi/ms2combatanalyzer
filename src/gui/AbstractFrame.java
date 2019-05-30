@@ -81,7 +81,9 @@ public abstract class AbstractFrame extends JFrame {
         	//g2d.getFontMetrics().stringWidth(hover.getTitle())
             String[] realLines = getLines(hover.getText(), g2d);
             int boxY = Tooltip.TEXT_SIZE * (realLines.length + 1) + MARGIN * 3;
+            int boxWidth = (int)(getMaxLineWidth(g2d, hover.getTitle(), realLines) * 1.2) + MARGIN * 2;
             int yOffset = 0;
+            int xOffset = 0;
             if ((int)p.getY() + boxY > getBounds().getHeight()) {
             	yOffset = -1 * boxY;
             }
@@ -89,13 +91,16 @@ public abstract class AbstractFrame extends JFrame {
             	int total = (int)(p.getY() + yOffset + boxY);
             	yOffset -= total - getBounds().getHeight();
             }
-    		label.drawRect(theGraphics, (int)p.getX(), (int)p.getY() + yOffset, (int)(getMaxLineWidth(g2d, hover.getTitle(), realLines) * 0.75) + MARGIN * 2,
+            if (p.getX() + boxWidth > getBounds().getWidth()) {
+            	xOffset -= boxWidth;
+            }
+    		label.drawRect(theGraphics, (int)p.getX() + xOffset, (int)p.getY() + yOffset, (int)(getMaxLineWidth(g2d, hover.getTitle(), realLines) * 1.2) + MARGIN * 2,
     				boxY, Color.BLACK, (float) 0.7);
-    		label.drawNormalText(g2d, hover.getTitle(), Tooltip.TEXT_SIZE, (int)p.getX() + MARGIN, (int)p.getY() + MARGIN * 3 + yOffset, 1,
+    		label.drawNormalText(g2d, hover.getTitle(), Tooltip.TEXT_SIZE, (int)p.getX() + MARGIN + xOffset, (int)p.getY() + MARGIN * 3 + yOffset, 1,
                     Color.WHITE, AbstractLabel.SHADOW_COLOR.darker());
             for (int i = 0; i < realLines.length; i++) {
             	if (realLines[i] != null)
-	            	label.drawNormalText(g2d, realLines[i], Tooltip.TEXT_SIZE, (int)p.getX() + MARGIN,
+	            	label.drawNormalText(g2d, realLines[i], Tooltip.TEXT_SIZE, (int)p.getX() + MARGIN + xOffset,
 	    	        		(int)p.getY() + MARGIN * 5 + Tooltip.TEXT_SIZE * (i + 1) + yOffset, 1, Color.WHITE, AbstractLabel.SHADOW_COLOR.darker());
             }
         }
@@ -125,6 +130,10 @@ public abstract class AbstractFrame extends JFrame {
     	while (word < words.length && text.length() > 0) {
     		StringBuilder newLine = new StringBuilder();
     		while (word < words.length && g2d.getFontMetrics().stringWidth(newLine.toString()) < WIDTH) {
+    			if (words[word].contains("$")) {
+    				word++;
+    				break;
+    			}
     			newLine.append(words[word]);
     			newLine.append(" ");
     			if (g2d.getFontMetrics().stringWidth(newLine.toString().substring(0, newLine.toString().length() - 1)) > WIDTH) { //carry-over

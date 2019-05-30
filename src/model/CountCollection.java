@@ -1,5 +1,7 @@
 package model;
 
+import java.math.BigInteger;
+
 /**
  * A DataCollection that counts up every time a certain image is found.
  * There is a cooldown between how often it can count.
@@ -29,7 +31,7 @@ public class CountCollection extends DataCollection {
 				hits++;
 			}
 		}
-		addData(hits);
+		addData(new BigInteger(Integer.toString(hits)));
 	}
 
 	@Override

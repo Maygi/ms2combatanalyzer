@@ -3,12 +3,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Toolkit;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -19,19 +21,19 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import org.sikuli.script.*;
 
-import gui.Overlay;
-import gui.Report;
-import model.MainDriver.TrackPoint;
+import gui.OverlayFrame;
+import gui.GraphFrame;
 import sound.Sound;
+import util.VersionCheck;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.1
+ * Version 1.3
  * @author May
  */
 public class MainDriver {
 	
-	public static final String VERSION = "1.2";
+	public static final String VERSION = "1.3";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -42,6 +44,7 @@ public class MainDriver {
 	 */
 	private static final long RESET_THRESHOLD = 10000;
 	
+	public static boolean started = false;
 	public static boolean active = false;
 	public static boolean mute = false;
 	private static final long DEFAULT_TIME = -5000000;
@@ -62,31 +65,96 @@ public class MainDriver {
 		//debuffs
 		SMITE("Smiting Aura", "Increases damage taken by target", "smitingaura.png", Resolution.BOSS_DEBUFFS),
 		SHIELDTOSS("Shield Toss", "Decreases defense of target", "shieldtoss.png", Resolution.BOSS_DEBUFFS, 0.999),
-		MOD("Mark of Death", "Increases damage taken by target", "markofdeath.png", Resolution.BOSS_DEBUFFS, 0.999),
-		CELESTIAL_LIGHT("Celestial Light", "Inflicts damage over time and increases SP regen by 50%", "celestiallight.png", Resolution.BOSS_DEBUFFS, 0.999),
+		MOD("Mark of Death", "Increases damage taken by target", "markofdeath.png", Resolution.BOSS_DEBUFFS, 0.9995),
 		STATIC_FLASH("Static Flash", "Decreases defense of target", "staticflash.png", Resolution.BOSS_DEBUFFS, 0.9995),
 		RAGING_TEMPEST("Raging Tempest", "Decreases target's evasion and accuracy", "ragingtempest.png", Resolution.BOSS_DEBUFFS, 0.999),
-		SHADOW_CHASER("Shadow Chaser", "Recovers an additional 1 spirit every 0.1 seconds", "shadowchaser.png", Resolution.BOSS_DEBUFFS, 0.999),
-		POISON_EDGE("Poison Edge", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonedge.png", Resolution.BOSS_DEBUFFS, 0.999),
-		POISON_VIAL("Poison Vial", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonvial.png", Resolution.BOSS_DEBUFFS, 0.999),
 
 		//buffs
-		IRON_DEFENSE("Iron Defense", "Increases SP regen, and decreases damage taken and dealt", "irondefense.png", Resolution.BUFFS),
-		SHIELD_MASTERY("Shield Mastery", "Increases damage after a successful block", "shieldmastery.png", Resolution.BUFFS, 0.999),
-		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", Resolution.BUFFS, 0.995),
 		BLESSINGS("Celestial Blessings", "Increases damage and resistance", "blessings.png", Resolution.BUFFS, 0.9),
-		SHARPEYES("Sharp Eyes", "Increases critical rate and accuracy", "sharpeyes.png", Resolution.BUFFS, 0.999),
-		FATAL_STRIKES("Fatal Strikes", "All attacks deal critical damage", "fatalstrikes.png", Resolution.BUFFS, 0.999),
 		FOCUSSEAL("Focus Seal", "Increases physical/magic attack", "focusseal.png", Resolution.BUFFS, 0.9995),
 		WARHORN("Warhorn", "Increases physical/magic attack", "warhorn.png", Resolution.BUFFS, 0.999),
 		HONINGRUNES("Honing Runes", "Increases critical damage", "honingrunes.png", Resolution.BUFFS, 0.999),
-		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", Resolution.BUFFS, 0.99),
-		BRONZE_EAGLE("Bronze Eagle", "Increases Dexterity", "bronzeeagle.png", Resolution.BUFFS, 0.9995),
-		EAGLES_MAJESTY("Eagle's Majesty", "Restores SP per second, and Bronze Eagle deals additional damage on hit", "eaglesmajesty.png", Resolution.BUFFS, 0.999),
-		DARKAURA("Dark Aura", "Increases spirit regen, stacking up to 10 times on hit", "darkaura.png", Resolution.BUFFS, 0.99),
+		SHARPEYES("Sharp Eyes", "Increases critical rate and accuracy", "sharpeyes.png", Resolution.BUFFS, 0.999),
 		HOLY_SYMBOL("Holy Symbol", "Increases attack speed, accuracy, and damage", "holysymbol.png", Resolution.BUFFS, 0.999),
 		VARR_WINGS("Varrekant's Wings", "Increases Piercing by 10%", "varrwings.png", "varrwings3.png", Resolution.BUFFS, 0.99),
 		WEAPON_PROC("Weapon Proc", "Weapon proc effect - varies with equipment", "weaponbuff.png", Resolution.BUFFS, 0.9999),
+		
+		//personal debuffs
+		FLAME_WAVE("Flame Wave", "Inflicts damage over time", "flamewave.png", Resolution.BOSS_DEBUFFS, 0.999, ClassConstants.WIZARD),
+		CELESTIAL_LIGHT("Celestial Light", "Inflicts damage over time and increases SP regen by 50%", "celestiallight.png", Resolution.BOSS_DEBUFFS, 0.999, ClassConstants.PRIEST),
+		SHADOW_CHASER("Shadow Chaser", "Recovers an additional 1 spirit every 0.1 seconds", "shadowchaser.png", Resolution.BOSS_DEBUFFS, 0.999, ClassConstants.ASSASSIN),
+		POISON_EDGE("Poison Edge", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonedge.png", Resolution.BOSS_DEBUFFS, 0.999, ClassConstants.THIEF),
+		POISON_VIAL("Poison Vial", "Inflicts damage over time, and increases damage dealt with Ruthless Guile", "poisonvial.png", Resolution.BOSS_DEBUFFS, 0.999, ClassConstants.THIEF),
+		
+		//personal buffs
+		IRON_DEFENSE("Iron Defense", "Increases SP regen, and decreases damage taken and dealt", "irondefense.png", Resolution.BUFFS, ClassConstants.KNIGHT),
+		SHIELD_MASTERY("Shield Mastery", "Increases damage after a successful block", "shieldmastery.png", Resolution.BUFFS, 0.999, ClassConstants.KNIGHT),
+		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", Resolution.BUFFS, 0.995, ClassConstants.PRIEST),
+		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", Resolution.BUFFS, 0.99, ClassConstants.ARCHER),
+		BRONZE_EAGLE("Bronze Eagle", "Increases Dexterity", "bronzeeagle.png", Resolution.BUFFS, 0.9995, ClassConstants.ARCHER),
+		EAGLES_MAJESTY("Eagle's Majesty", "Restores SP per second, and Bronze Eagle deals additional damage on hit", "eaglesmajesty.png", Resolution.BUFFS, 0.99, ClassConstants.ARCHER),
+		FATAL_STRIKES("Fatal Strikes", "All attacks deal critical damage", "fatalstrikes.png", Resolution.BUFFS, 0.999, ClassConstants.ASSASSIN),
+		DARKAURA("Dark Aura", "Increases spirit regen, stacking up to 10 times on hit", "darkaura.png", Resolution.BUFFS, 0.99, ClassConstants.BERSERKER),
+		RETALIATION("Retaliation", "Increases physical and magic attack as well as evasion", "retaliation.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),
+		MESOGUARD("Mesoguard Plus", "Increases physical and magic attack ", "mesoguard.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),
+		HASTE("Haste", "Increases attack speed, movement speed, physical attack, and magic attack", "haste.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),
+		
+		// lapentiers
+		ROOTED_STRENGTH("Rooted Strength", "Increases damage by 30% but reduces movement speed by 80%", "rootedstrength.png", Resolution.BUFFS, 0.999),
+		
+		// lapenshards
+		PINK_BEANS_PRANK("Pink Bean's Prank", "Increases physical and magic attack", "pinkbeansprank.png", Resolution.BUFFS, 0.999),
+		
+		//wizard awakening
+		FLAME_IMP("Flame Imp", "Embers will always crit. Chance to reset BBQ party on crit.", "playingwithfire.png", Resolution.BUFFS, 0.999, ClassConstants.WIZARD),
+		MANA_CONTROL("Mana Control", "Increases movement speed by 35% and magic attack by 20%", "manacontrol.png", Resolution.BUFFS, 0.999, ClassConstants.WIZARD),
+		MANA_CONTROL2("Mana Control - SP", "Increases movement speed by 35% and decreases SP costs by half", "manacontrol2.png", Resolution.BUFFS, 0.999, ClassConstants.WIZARD),
+		PARTY_TIME("Party Time", "BBQ party can be cast instantly", "partytime.png", Resolution.BUFFS, 0.999, ClassConstants.WIZARD),
+		PERFECT_STORM("Perfect Storm", "Increases electric and ice damage", "perfectstorm.png", Resolution.BUFFS, 0.999, ClassConstants.WIZARD),
+		FROST("Frost", "Electric part of dualcast deals additional damage", "frost.png", Resolution.BOSS_DEBUFFS, 0.9995, ClassConstants.WIZARD),
+		CHILL("Chill", "Target takes bonus damage from thunderbolt", "chill.png", Resolution.BOSS_DEBUFFS, 0.9995, ClassConstants.WIZARD),
+		
+		//sb awakening
+		SOUL_DISSONANCE("Soul Dissonance", "Decreases evasion and critical evasion of target", "souldissonance.png", Resolution.BOSS_DEBUFFS, 0.999),
+		SOUL_FLOCK("Soul Flock", "Decreases defense of target", "soulflock.png", Resolution.BOSS_DEBUFFS, 0.999),
+		VISION_TORRENT("Vision Torrent", "Increases magic attack and enhances skills", "visiontorrent.png", Resolution.BUFFS, 0.999, ClassConstants.SOUL_BINDER),
+		
+		//priest awakening
+		PURIFYING_LIGHT("Purifying Light", "Decreases defense of target", "purifyinglight.png", Resolution.BOSS_DEBUFFS, 0.999),
+		VITALITY("Vitality", "Increased physical and magic attack", "vitality.png", Resolution.BUFFS, 0.999),
+		GREATER_HEAL("Greater Heal", "Restoring health over time. 50% of this uptime is a damage buff", "greaterheal.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
+		HEAVENS_WRATH("Heaven's Wrath", "Increased stamina recovery, max health, movespeed, and access to Light Sword", "lightsword.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
+		
+		//archer awakening
+		FLAME_ARROW_1("Flame Arrow I", "Multi-drive shot I is ready", "flamearrow1.png", Resolution.BUFFS, 0.8, ClassConstants.ARCHER),
+		FLAME_ARROW_2("Flame Arrow II", "Multi-drive shot II is ready", "flamearrow2.png", Resolution.BUFFS, 0.8, ClassConstants.ARCHER),
+		WIND_DRAW("Full Wind Draw", "Archer's secrets is ready", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
+		RANGERS_FOCUS("Ranger's Focus", "Increases physical attack and enables Flame Arrow IV", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
+		ARCHERS_SECRETS("Archer's Secrets", "Increases piercing and accuracy, and enables enhanced skills", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
+		GREATER_SHARP_EYES("Greater Sharp Eyes", "Increases physical attack of caster", "greatersharpeyes.png", Resolution.BUFFS, 0.999),
+		
+		//knight awakening
+		CYCLONE_SHIELD("Cyclone Shield", "Decreases defense of target", "cycloneshield.png", Resolution.BOSS_DEBUFFS, 0.9995),
+		DIVINE_RETRIBUTION("Divine Retribution", "Increases physical/magical attack, but decreases defense and disables shield skills", "divineretribution.png", Resolution.BUFFS, 0.9995, ClassConstants.KNIGHT),
+		
+		//assassin awakening
+		SHADOW_STANCE("Shadow Stance", "Increases dark damage while the shield holds", "shadowstance.png", Resolution.BUFFS, 0.999, ClassConstants.ASSASSIN),
+		
+		//berserker awakening
+		BLOOD_FURY("Blood Fury", "Increases physical attack and Bloodlust damage", "bloodfury.png", Resolution.BUFFS, 0.999, ClassConstants.BERSERKER),
+		RUTHLESS("Ruthless", "Skull Splitter's third attack can be used instantly", "ruthless.png", Resolution.BUFFS, 0.999, ClassConstants.BERSERKER),
+		RAGING_SOUL("Raging Soul", "Increased attack speed, physical attack, and dark damage", "ragingsoul.png", Resolution.BUFFS, 0.999, ClassConstants.BERSERKER),
+		
+		//striker
+		OVERCOME("Overcome", "Increases attack speed, movement speed, physical attack, and magic attack", "bloodfury.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		FIGHTING_SPIRIT("Fighting Spirit - Vengeance", "Increased damage", "vengeance.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		PATTERN_BREAK("Pattern Break", "Increases accuracy", "patternbreak.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		MERIDIAN_FLOW("Meridian Flow I", "Increases physical attack, attack speed, and restores SP over time", "meridianflow1.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		MERIDIAN_FLOW2("Meridian Flow II", "Increases physical attack, attack speed, and restores SP over time", "meridianflow2.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		MERIDIAN_FLOW3("Meridian Flow III", "Increases physical attack, attack speed, and restores SP over time", "meridianflow3.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+
+		//thief awakening
+		RUSH("Battle Step - Rush", "Increases physical attack and movement speed", "rush.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),		
 		
 		//misc
 		SPIRIT("SP Efficiency: ", "% of the time SP was under 100%", "spirit.png", Resolution.SPIRIT, 0.94),
@@ -100,9 +168,13 @@ public class MainDriver {
 		BLESSINGS_AMP("Damage Amplified: ", "0"),
 		SHIELDTOSS_AMP("Damage Amplified: ", "0"), //are these redundant or what
 		STATIC_FLASH_AMP("Damage Amplified: ", "0"),
+		CYCLONE_SHIELD_AMP("Damage Amplified: ", "0"),
+		PURIFYING_LIGHT_AMP("Damage Amplified: ", "0"),
+		SOUL_FLOCK_AMP("Damage Amplified: ", "0"),
 		MOD_AMP("Damage Amplified: ", "0"),
 		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png", Resolution.DUNGEON_CLEAR),
-		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
+		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "dead.png", Resolution.TOMBSTONE, 0.99),
+		//TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
 		INFERNOG_BOMB("Infernog Blue Bomb", "Drops a puddle when the timer ends", "infernogbomb.png", Resolution.DEBUFFS, 0.99),
 		BOSS_HEAL("Boss Healing", "Number of times the boss healed", "bossheal.png", Resolution.BOSS_BUFFS, 0.95),
 		SHIELD("Shield Uptime", "Reduces damage taken by 50%", "shield.png", Resolution.BOSS_BUFFS),
@@ -112,6 +184,8 @@ public class MainDriver {
 		private String name, intro, image, secondaryImage = null;
 		private double threshold;
 		private int regionIndex;
+		private int classIndex = -1;
+		
 		private TrackPoint(String name, String intro, int regionIndex) {
 			this.regionIndex = regionIndex;
 			this.name = name;
@@ -179,6 +253,14 @@ public class MainDriver {
 			this.image = image;
 			this.threshold = threshold;
 		}
+		private TrackPoint(String name, String intro, String image, int resolutionIndex, double threshold, int classIndex) {
+			this.regionIndex = resolutionIndex;
+			this.name = name;
+			this.intro = intro;
+			this.image = image;
+			this.threshold = threshold;
+			this.classIndex = classIndex;
+		}
 		private TrackPoint(String name, String image, int resolutionIndex, double threshold) {
 			this.regionIndex = resolutionIndex;
 			this.name = name;
@@ -190,6 +272,9 @@ public class MainDriver {
 		}
 		public String getIntro() {
 			return intro;
+		}
+		public int getClassIndex() {
+			return classIndex;
 		}
 		
 		/**
@@ -253,8 +338,8 @@ public class MainDriver {
 		}
 	}
 
-	private static Overlay overlay = new Overlay();
-	private static Report report = new Report();
+	private static OverlayFrame overlay = new OverlayFrame();
+	private static GraphFrame report = new GraphFrame();
     
     public static final Color MAIN_COLOR = new Color(255, 209, 220);
 	public static Properties props;
@@ -271,7 +356,7 @@ public class MainDriver {
         }
     }
 	
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
     	props = new Properties();
     	try {
     		props.load(new FileReader("config.properties"));
@@ -341,13 +426,17 @@ public class MainDriver {
     
     public static Map<TrackPoint, DataCollection> data;
     public static Map<Integer, List<TrackPoint>> trackPointByRegion;
+    public static PrintStream logOutput;
+    public static String liveVersion = VERSION;
     
-    public static void run() {
+    public static void run() throws FileNotFoundException {
+		logOutput = new PrintStream(new File("log.txt"));
         long lastLoopTime = System.nanoTime();
         final int TARGET_FPS = 2; //check twice per second
         final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
         long lastFpsTime = 0;
         initializeData();
+    	liveVersion = VersionCheck.getVersion();
         while(true){
             long now = System.nanoTime();
             long updateLength = now - lastLoopTime;
@@ -377,22 +466,23 @@ public class MainDriver {
     	data = new TreeMap<TrackPoint, DataCollection>();
         data.put(TrackPoint.TIME, new TimeCollection());
         data.put(TrackPoint.HP, new DataCollection());
-        data.put(TrackPoint.RAID_DPS, new DeltaCollection(data.get(TrackPoint.HP), 1)); //this counts total damage; divided by seconds in chart
-        data.put(TrackPoint.DMG_MITIGATED, new DeltaCollection(data.get(TrackPoint.HP), 1)); //mitigated is conditional - see tick method
+        data.put(TrackPoint.RAID_DPS, new DeltaCollection(data.get(TrackPoint.HP), 1, DeltaCollection.OTHER)); //this counts total damage; divided by seconds in chart
+        data.put(TrackPoint.DMG_MITIGATED, new DeltaCollection(data.get(TrackPoint.HP), 1, DeltaCollection.OTHER)); //mitigated is conditional - see tick method
         data.put(TrackPoint.SHIELD2, new HitMissCollection());
         data.put(TrackPoint.SHIELD, new HitMissCollection());
         data.put(TrackPoint.BOSS_HEAL, new CountCollection(2));
-        data.put(TrackPoint.MOD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1)); //assumes max level
-        data.put(TrackPoint.SHIELDTOSS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064)); //assumes max level
-        data.put(TrackPoint.STATIC_FLASH_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1)); //assumes max level
-        data.put(TrackPoint.SMITE_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064)); //assumes max level
-        data.put(TrackPoint.BLESSINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064)); //assumes max level. may be inaccurate
+        data.put(TrackPoint.MOD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.DAMAGE_AMP)); //assumes max level
+        data.put(TrackPoint.SHIELDTOSS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.STATIC_FLASH_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.SMITE_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DAMAGE_AMP)); //assumes max level
+        data.put(TrackPoint.BLESSINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DAMAGE_AMP)); //assumes max level. may be inaccurate
         data.put(TrackPoint.POISON_EDGE, new HitMissCollection());
         data.put(TrackPoint.POISON_VIAL, new HitMissCollection());
         data.put(TrackPoint.RAGING_TEMPEST, new HitMissCollection());
-        data.put(TrackPoint.STATIC_FLASH, new HitMissCollection());
-        data.put(TrackPoint.MOD, new HitMissCollection());
-        data.put(TrackPoint.SHIELDTOSS, new HitMissCollection());
+        data.put(TrackPoint.STATIC_FLASH, new HitMissCollection(TrackPoint.STATIC_FLASH_AMP));
+        data.put(TrackPoint.MOD, new HitMissCollection(TrackPoint.MOD_AMP));
+        data.put(TrackPoint.SHIELDTOSS, new HitMissCollection(TrackPoint.SHIELDTOSS_AMP));
+        data.put(TrackPoint.FLAME_WAVE, new HitMissCollection());
         data.put(TrackPoint.IRON_DEFENSE, new HitMissCollection());
         data.put(TrackPoint.DARKAURA, new HitMissCollection());
         data.put(TrackPoint.SNIPE, new HitMissCollection());
@@ -411,15 +501,73 @@ public class MainDriver {
         data.put(TrackPoint.SHIELD_MASTERY, new HitMissCollection());
         data.put(TrackPoint.SPIRIT, new HitMissCollection());
         data.put(TrackPoint.HOLY_SYMBOL, new HitMissCollection());
-        data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection());
+        data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection(Sound.PROC, 21));
         data.put(TrackPoint.DUNGEON_COMPLETE, new HitMissCollection());
         data.put(TrackPoint.TOMBSTONE, new HitMissCollection());
         data.put(TrackPoint.VARR_WINGS, new HitMissCollection(Sound.PROC, 10));
         data.put(TrackPoint.INFERNOG_BOMB, new HitMissCollection(Sound.STATUS_WARNING, 11));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE, new DPSCollection((HitMissCollection)data.get(TrackPoint.HOLY_SYMBOL), 
             	(DeltaCollection)data.get(TrackPoint.RAID_DPS)));
-        data.put(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW, new DeltaCollection(data.get(TrackPoint.HP), 1)); //assumes max level
+        data.put(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW, new DeltaCollection(data.get(TrackPoint.HP), 1, DeltaCollection.DAMAGE_AMP)); //assumes max level
 
+        //archer awakening
+        data.put(TrackPoint.FLAME_ARROW_1, new HitMissCollection(Sound.PROC2, 10));
+        data.put(TrackPoint.FLAME_ARROW_2, new HitMissCollection(Sound.PROC2, 10));
+        data.put(TrackPoint.RANGERS_FOCUS, new HitMissCollection());
+        data.put(TrackPoint.WIND_DRAW, new HitMissCollection(Sound.PROC2, 10));
+        data.put(TrackPoint.ARCHERS_SECRETS, new HitMissCollection());
+        data.put(TrackPoint.GREATER_SHARP_EYES, new HitMissCollection());
+        
+        //assassin awakening
+        /*data.put(TrackPoint.SHADOW_STANCE, new HitMissCollection());
+        
+        //berserker awakening
+        data.put(TrackPoint.BLOOD_FURY, new HitMissCollection());
+        data.put(TrackPoint.RUTHLESS, new HitMissCollection(Sound.PROC2, 2));
+        data.put(TrackPoint.RAGING_SOUL, new HitMissCollection());*/
+        
+        //knight awakening
+        data.put(TrackPoint.CYCLONE_SHIELD, new HitMissCollection(TrackPoint.CYCLONE_SHIELD_AMP));
+        data.put(TrackPoint.CYCLONE_SHIELD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.08, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.DIVINE_RETRIBUTION, new HitMissCollection());
+        
+        //priest awakening
+        data.put(TrackPoint.PURIFYING_LIGHT, new HitMissCollection(TrackPoint.PURIFYING_LIGHT_AMP));
+        data.put(TrackPoint.PURIFYING_LIGHT_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.06, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.HEAVENS_WRATH, new HitMissCollection());
+        data.put(TrackPoint.GREATER_HEAL, new HitMissCollection());
+        data.put(TrackPoint.VITALITY, new HitMissCollection());
+        
+        //soul binder awakening
+        data.put(TrackPoint.SOUL_DISSONANCE, new HitMissCollection());
+        data.put(TrackPoint.SOUL_FLOCK, new HitMissCollection(TrackPoint.SOUL_FLOCK_AMP));
+        data.put(TrackPoint.SOUL_FLOCK_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.15, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.VISION_TORRENT, new HitMissCollection());
+        
+        //striker
+       /* data.put(TrackPoint.OVERCOME, new HitMissCollection());
+        data.put(TrackPoint.FIGHTING_SPIRIT, new HitMissCollection());
+        data.put(TrackPoint.PATTERN_BREAK, new HitMissCollection());
+        data.put(TrackPoint.MERIDIAN_FLOW, new HitMissCollection());
+        data.put(TrackPoint.MERIDIAN_FLOW2, new HitMissCollection());
+        data.put(TrackPoint.MERIDIAN_FLOW3, new HitMissCollection());*/
+        
+        //thief
+        data.put(TrackPoint.RETALIATION, new HitMissCollection());
+        data.put(TrackPoint.MESOGUARD, new HitMissCollection());
+        data.put(TrackPoint.HASTE, new HitMissCollection());
+        
+        //wizard awakening
+        data.put(TrackPoint.FLAME_IMP, new HitMissCollection());
+        data.put(TrackPoint.PARTY_TIME, new HitMissCollection(Sound.PROC2, 1));
+        data.put(TrackPoint.MANA_CONTROL, new HitMissCollection());
+        data.put(TrackPoint.MANA_CONTROL2, new HitMissCollection());
+        data.put(TrackPoint.PERFECT_STORM, new HitMissCollection());
+        data.put(TrackPoint.FROST, new HitMissCollection());
+        data.put(TrackPoint.CHILL, new HitMissCollection());
+        
+        data.put(TrackPoint.ROOTED_STRENGTH, new HitMissCollection());
+        data.put(TrackPoint.PINK_BEANS_PRANK, new HitMissCollection());
     	trackPointByRegion = new TreeMap<Integer, List<TrackPoint>>();
     	for (TrackPoint tp : data.keySet()) {
     		int region = tp.getRegionIndex();
@@ -455,8 +603,13 @@ public class MainDriver {
     	startTime = DEFAULT_TIME;
     	pauseTime = DEFAULT_TIME;
     	active = false;
+    	started = false;
     	Sound.RESET.play();
         overlay.resetTooltips();
+		firstHPReading = null;
+        lastHPReading = null;
+        secondReading = null;
+        activeClass = -1;
     }
     
     /**
@@ -467,6 +620,9 @@ public class MainDriver {
     		pauseTime = System.currentTimeMillis();
 	    	active = false;
 	    	Sound.PAUSE.play();
+			firstHPReading = null;
+	        lastHPReading = null;
+	        secondReading = null;
     	}
     }
     
@@ -496,6 +652,7 @@ public class MainDriver {
         		startTime = System.currentTimeMillis();
         	}
         	active = true;
+        	started = true;
     	}
     }
     /**
@@ -552,6 +709,39 @@ public class MainDriver {
     	}
     	
     }
+    
+    private static BigInteger firstHPReading = null;
+    private static BigInteger lastHPReading = null;
+    private static BigInteger secondReading = null;
+    private static int activeClass = -1;
+    
+    /**
+     * Whether or not the program should get ready to check for the clear screen.
+     * @return
+     */
+    private static boolean checkForClear() {
+    	if (firstHPReading != null && lastHPReading != null) {
+    		return (lastHPReading.compareTo(firstHPReading.divide(new BigInteger("10"))) < 0);
+    	}
+    	return false;
+    }
+    
+    public static boolean isClose(BigInteger one, BigInteger two) {
+    	if (one.subtract(two).abs().compareTo(new BigInteger("5000000")) <= 0)
+    		return true;
+    	BigInteger bigger, smaller;
+    	if (one.compareTo(two) > 0) {
+    		bigger = one;
+    		smaller = two;
+    	} else {
+    		bigger = two;
+    		smaller = one;
+    	}
+    	if (smaller.multiply(new BigInteger("2")).compareTo(bigger) <= 0) //if it's over 2x difference, it's bad
+    		return false;
+    	return true;
+    }
+    
     public static void tick() {
         //double timeMultiplier = ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTimeMultiplier();
         //System.out.println("Multiplier: "+timeMultiplier);
@@ -573,9 +763,18 @@ public class MainDriver {
 			}
         }
     	for (TrackPoint tp : data.keySet()) {
+    		if (activeClass >= 0 && tp.getClassIndex() >= 0 && tp.getClassIndex() != activeClass) {
+    			continue;
+    		}
     		DataCollection dc = data.get(tp);
     		String image = tp.getImage();
     		Match m;
+
+    		/*if (tp.getName().equalsIgnoreCase("Greater Sharp Eyes")) { //special case
+    			if (activeClass != ClassConstants.ARCHER) {
+    				dc = data.get(TrackPoint.SHARPEYES);
+    			}
+    		}*/
     		if (dc instanceof TimeCollection && active) {
     			((TimeCollection) dc).addData(System.currentTimeMillis());
     			continue;
@@ -583,6 +782,9 @@ public class MainDriver {
     		if (image != null && (dc instanceof HitMissCollection || dc instanceof CountCollection)) {
 	    		boolean hit;
 	    		if (tp.usesScreen()) {
+					if (tp.getName().contains("Dungeon Complete") && !checkForClear()) {
+						continue;
+					}
 	    			m = s.exists(image, 0.01);
 	    		} else {
 	    			//int[] region = tp.getRegion();
@@ -592,24 +794,17 @@ public class MainDriver {
 		    			m = r.exists(tp.getSecondaryImage(), 0.01);
 		    		}
 	    		}
-	    	
+	    		/*if (tp.getName().contains("Mark of") && m != null) {
+	    			System.out.println(tp.getName()+": "+m.getScore());
+	    		}*/
 				hit = m != null && m.getScore() >= tp.getThreshold();
 				if (tp.getName().contains("Dungeon Complete") && hit) {
 					pause();
 					break;
 				}
-				if (tp.getName().contains("Smiting Aura") && hit)
-					((DeltaCollection)data.get(TrackPoint.SMITE_AMP)).handleHit(true);
-				if (tp.getName().contains("Static Flash") && hit)
-					((DeltaCollection)data.get(TrackPoint.STATIC_FLASH_AMP)).handleHit(true);
-				if (tp.getName().contains("Shield Toss") && hit)
-					((DeltaCollection)data.get(TrackPoint.SHIELDTOSS_AMP)).handleHit(true);
-				if (tp.getName().contains("Mark of Death") && hit)
-					((DeltaCollection)data.get(TrackPoint.MOD_AMP)).handleHit(true);
-				if (tp.getName().contains("Blessings") && hit)
-					((DeltaCollection)data.get(TrackPoint.BLESSINGS_AMP)).handleHit(true);
-				//if (tp.getName().contains("Holy Symbol") && hit)
-				//	((DeltaCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE)).handleHit(true);
+				if (hit && tp.getClassIndex() >= 0) {
+					activeClass = tp.getClassIndex();
+				}
 				if (tp.getName().contains("Holy Symbol") && hit)
 					((DeltaCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW)).handleHit(true);
 				if (tp.getName().contains("Shield Uptime") && hit)
@@ -617,6 +812,9 @@ public class MainDriver {
 				if (tp.getName().contains("2x Shield Uptime") && hit)
 					shields = Math.max(shields,  2);
 				if (dc instanceof HitMissCollection) {
+					if (((HitMissCollection)dc).getTrackPoint() != null) {
+						((DeltaCollection)data.get(((HitMissCollection)dc).getTrackPoint())).handleHit(true);
+					}
 					if (tp.getName().contains("SP Efficiency"))
 						hit = !hit;
 					/*if (tp.getName().contains("Dark Aura") && hit) { //SORRY ZERKERS I TRIED
@@ -649,17 +847,38 @@ public class MainDriver {
     		} else if (tp.getRegion() != null) { //look for text
     			int[] region = tp.getRegion();
     	        Region r = new Region(region[0], region[1], region[2] - region[0], region[3] - region[1]);
+    			//System.out.println(tp.getName() +": "+r.toString());
     	        String[] text = r.text().split("\n");
     	        //String text = ocr.read(new Rectangle(region[0], region[1], region[2], region[3]));
-    	        int value = -1;
+    	        BigInteger value = null;
     	        for (String string : text) {
     	        	try {
-    	        		value = Integer.parseInt(string);
+    	        		value = new BigInteger(string);
+    	        		if (!isClose(value, lastHPReading)) { //bad reading
+    	        	        if (dc.getData().size() < 5) {
+    	        	        	if (secondReading == null) { //could the next reading be more accurate, perhaps?
+	    	        	        	secondReading = value;
+	    	        	        	value = null;
+    	        	        	} else {
+    	        	        		if (isClose(value, secondReading)) { //second reading is better
+    	        	        			lastHPReading = secondReading;
+    	        	        		} else { //second reading is not better
+    	        	        			secondReading = value;
+    	        	        			value = null;
+    	        	        		}
+    	        	        	}
+    	        	        } else {
+        	        			System.out.println("BAD READING! "+value.toString()+"; last: "+lastHPReading.toString());
+        	        			value = null;
+    	        	        }
+    	        		} else {
+    	        			lastHPReading = value;
+    	        		}
     	        	} catch (Exception e) {
-    	        		
+    	        		//e.printStackTrace();
     	        	}
     	        }
-    	        if (value != -1 && tp.getName().contains("HP") && !active) {
+    	        if (value != null && tp.getName().contains("HP") && !active) {
     	        	int[] regionBoss = TrackPoint.BOSS.getRegion();
         	        Region r2 = new Region(regionBoss[0], regionBoss[1], regionBoss[2] - regionBoss[0], regionBoss[3] - regionBoss[1]);
 	    			m = r2.exists(TrackPoint.BOSS.getImage(), 0.01);
@@ -667,15 +886,28 @@ public class MainDriver {
 	    				System.out.println("Found HP: "+value+", but unable to find [Boss] tag.");
 	    			} else {
 		    			System.out.println("Starting: "+value);
-		    			if (m != null && value > 0)
+		    			lastHPReading = value;
+		    			firstHPReading = value;
+		    			if (m != null && value.compareTo(BigInteger.ZERO) > 0)
 		    				start();
 	    			}
     	        }
-    	        dc.addData(value);
+    	        if (active)
+    	        	dc.addData(value);
+    	        logOutput.println("Adding: "+ value);
+    	        logOutput.println(dc.getData().toString());
     		}
     	}
     	((DeltaCollection)data.get(TrackPoint.RAID_DPS)).handleHit(true);
     	((DeltaCollection)data.get(TrackPoint.DMG_MITIGATED)).handleHit(shields > 0, shields == 1 ? 1 : 4);
+    	DeltaCollection.preProcess();
+    	for (TrackPoint tp : data.keySet()) {
+    		DataCollection dc = data.get(tp);
+    		if (dc instanceof DeltaCollection) {
+    			((DeltaCollection)dc).postProcess();
+    		}
+    	}
+    	DeltaCollection.finalProcess();
     	/*for (TrackPoint tp : data.keySet()) {
     		DataCollection dc = data.get(tp);
     		if (dc instanceof DeltaCollection) {

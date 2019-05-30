@@ -425,6 +425,7 @@ public abstract class AbstractLabel extends JLabel {
                                                             Image.SCALE_DEFAULT);
             theGraphics.drawImage(scaledImage, theX, theY, null);
         } catch (final IOException e) {
+        	System.err.println(theImageURL);
             e.printStackTrace();
         }
     }

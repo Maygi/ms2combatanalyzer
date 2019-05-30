@@ -72,10 +72,10 @@ public class DPSCollection extends DataCollection {
 		return 0;
 	}
 	
-	public int getHSDPS() {
+	public BigInteger getHSDPS() {
 		if (MainDriver.data.get(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW).data.size() > 0)
-			return (MainDriver.data.get(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW).getLast() / hsTime);
-		return 0;
+			return (MainDriver.data.get(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW).getLast().divide(new BigInteger(Integer.toString(hsTime))));
+		return BigInteger.ZERO;
 	}
 	
 	public int getAverageDPS() {
@@ -84,15 +84,15 @@ public class DPSCollection extends DataCollection {
 	
 	public void calculateHSDamage() {
 		List<Integer[]> endPoints = hs.getEndpoints();
-		List<Integer> data = raidDamage.getData();
+		List<BigInteger> data = raidDamage.getData();
 		BigInteger total = new BigInteger("0");
 		hsTime = 0;
 		if (endPoints.size() > 0) {
 			for (int i = 0; i < endPoints.size(); i++) {
 				try {
 					Integer[] endPointSet = endPoints.get(i);
-					BigInteger startDamage = new BigInteger(data.get(endPointSet[0]) + "");
-					BigInteger endDamage = new BigInteger(data.get(endPointSet[1]) + "");
+					BigInteger startDamage = data.get(endPointSet[0]);
+					BigInteger endDamage = data.get(endPointSet[1]);
 					if (i == endPoints.size() - 1)
 						lastHS = endPointSet[0];
 					BigInteger differential = endDamage.subtract(startDamage);
@@ -122,7 +122,7 @@ public class DPSCollection extends DataCollection {
 	public BigInteger findComparison(Integer[] endPointSet) {
 		int length = endPointSet[1] - endPointSet[0];
 		int[] scope = new int[2];
-		List<Integer> data = raidDamage.getData();
+		List<BigInteger> data = raidDamage.getData();
 		if (endPointSet[0] - 1 - length * SCOPE_MULTIPLIER < 0) { //use some data from later on
 			if (data.size() < endPointSet[1] + 1 + length * SCOPE_MULTIPLIER) { //not enough data
 				return null;
@@ -138,7 +138,7 @@ public class DPSCollection extends DataCollection {
 		int start = 0;
 		int end = 0;
 		for (int i = scope[0]; i < scope[1] - length; i++) {
-			BigInteger sum = new BigInteger((data.get(i + length) - data.get(i)) + "");
+			BigInteger sum = data.get(i + length).subtract(data.get(i));
 			if (sum.compareTo(largest) > 0) {
 				largest = sum;
 				start = i;
@@ -156,7 +156,7 @@ public class DPSCollection extends DataCollection {
 	 */
 	public void calculateAverageDamage() {
 		List<Integer[]> endPoints = hs.getEndpoints();
-		List<Integer> data = raidDamage.getData();
+		List<BigInteger> data = raidDamage.getData();
 		int start, end;
 		if (endPoints.size() == 0) { //no holy symbol
 			if (data.size() < BASE_TICKS * (SCOPE_MULTIPLIER + 1)) { //use everything
@@ -196,7 +196,7 @@ public class DPSCollection extends DataCollection {
 			}
 		}
 		BigInteger val = new BigInteger("0");
-		val = val.add(new BigInteger((data.get(end) - data.get(start) + "")));
+		val = val.add((data.get(end).subtract(data.get(start))));
 		int compareTime = ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTime(start, end);
 		if (compareTime == 0)
 			return;

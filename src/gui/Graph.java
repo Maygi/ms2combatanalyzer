@@ -6,9 +6,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.Point;
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -45,10 +44,37 @@ public class Graph extends AbstractLabel {
 	 */
 	private static final int GRAPH_Y_MARKERS = 5;
 	
+	private static final int ITEMS_PER_PAGE = 5;
+	
 	protected String currentTab = "Personal";
+	protected int currentPage = 0;
 	
 	protected Graph(JFrame theFrame, double theXPerc, double theYPerc) {
 		super(theFrame, theXPerc, theYPerc);
+	}
+	
+	protected boolean hasNextPage() {
+		TrackPoint[] toUse;
+        if (currentTab.equalsIgnoreCase("Personal"))
+        	toUse = PERSONAL;
+        else if (currentTab.equalsIgnoreCase("Buffs"))
+        	toUse = BUFFS;
+        else
+        	toUse = DEBUFFS;
+		int count = 0;
+		for (TrackPoint tp : toUse) {
+	        DataCollection dc = MainDriver.data.get(tp);
+	        if (dc.getLastInt() > 0)
+	        	count++;
+		}
+        int index = currentPage * ITEMS_PER_PAGE;
+        if (index + ITEMS_PER_PAGE < count)
+        	return true;
+        return false;
+	}
+	
+	protected boolean hasPreviousPage() {
+		return currentPage > 0;
 	}
 	
 	/**
@@ -63,7 +89,7 @@ public class Graph extends AbstractLabel {
 			return value;
 		else {
 			if (valueAsString.charAt(0) == '9') { //something like 990 -> 1000
-				return (int)Math.pow(10, valueAsString.length() - 1);
+				return (int)Math.pow(10, valueAsString.length());
 			} else {
 				int num = Integer.parseInt(valueAsString.charAt(0) + "");
 				int num2 = Integer.parseInt(valueAsString.charAt(1) + "");
@@ -76,12 +102,31 @@ public class Graph extends AbstractLabel {
     
     private static final TrackPoint[] PERSONAL = {
     	TrackPoint.GUARDIAN, TrackPoint.CELESTIAL_LIGHT,
+    	TrackPoint.HEAVENS_WRATH, TrackPoint.GREATER_HEAL,
+    	
     	TrackPoint.SHADOW_CHASER, TrackPoint.FATAL_STRIKES,
+    	//TrackPoint.SHADOW_STANCE,
+    	    	
     	TrackPoint.IRON_DEFENSE, TrackPoint.SHIELD_MASTERY,
+    	TrackPoint.DIVINE_RETRIBUTION,
+    	
     	TrackPoint.SNIPE, TrackPoint.BRONZE_EAGLE, TrackPoint.EAGLES_MAJESTY,
-    	TrackPoint.DARKAURA,
-    	TrackPoint.POISON_EDGE, TrackPoint.POISON_VIAL,
-    	TrackPoint.VARR_WINGS, TrackPoint.WEAPON_PROC,
+    	TrackPoint.RANGERS_FOCUS, TrackPoint.ARCHERS_SECRETS,
+    	
+    	/*TrackPoint.DARKAURA,
+    	TrackPoint.BLOOD_FURY, TrackPoint.RAGING_SOUL,*/
+    	
+    	TrackPoint.POISON_EDGE, TrackPoint.POISON_VIAL, TrackPoint.RETALIATION, TrackPoint.MESOGUARD, TrackPoint.HASTE,
+    	//TrackPoint.RUSH,
+    	
+    	TrackPoint.FLAME_WAVE, TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
+    	TrackPoint.PERFECT_STORM, TrackPoint.FROST, TrackPoint.CHILL,
+    	
+    	/*TrackPoint.OVERCOME, TrackPoint.FIGHTING_SPIRIT, TrackPoint.PATTERN_BREAK,
+    	TrackPoint.MERIDIAN_FLOW, TrackPoint.MERIDIAN_FLOW2, TrackPoint.MERIDIAN_FLOW3,*/
+    	
+    	TrackPoint.PINK_BEANS_PRANK, TrackPoint.ROOTED_STRENGTH,
+    	TrackPoint.VARR_WINGS, TrackPoint.WEAPON_PROC
     };
 
     
@@ -95,12 +140,12 @@ public class Graph extends AbstractLabel {
     };
 
     private static final GuiButton[] BUTTONS = {
-		GuiButton.PERSONAL, GuiButton.BUFFS, GuiButton.DEBUFFS
+		GuiButton.PERSONAL, GuiButton.BUFFS, GuiButton.DEBUFFS, GuiButton.UP, GuiButton.DOWN
     };
 
     public void addTooltip(TrackPoint tp, int x, int y) {
     	Tooltip toAdd = new Tooltip(x, y, tp.getName(), tp.getIntro());
-    	((Report)myFrame).tooltipMappings.put(toAdd, false);
+    	((GraphFrame)myFrame).tooltipMappings.put(toAdd, false);
     }
     
 
@@ -116,23 +161,24 @@ public class Graph extends AbstractLabel {
         HitMissCollection deaths = (HitMissCollection)MainDriver.data.get(TrackPoint.TOMBSTONE);
         int totalTime = tc.getTime(0, tc.getTimeData().size() - 1);
         int timeTicks = (int)Math.ceil((double)totalTime / 30.0);
-        List<Integer> raidDamage = ((DeltaCollection)MainDriver.data.get(TrackPoint.RAID_DPS)).getSoftDeltas();
-        int highest = -1;
+        List<BigInteger> raidDamage = ((DeltaCollection)MainDriver.data.get(TrackPoint.RAID_DPS)).getSoftDeltas();
+        List<BigInteger> hp = ((DataCollection)MainDriver.data.get(TrackPoint.HP)).getData();
+        BigInteger highest = new BigInteger("-1");
         int mouseIndex = -1;
         List<Point> graphPoints = new ArrayList<Point>();
         if (raidDamage.size() < 1) {
         	//System.out.println("Not enough data to graph.");
         } else {
 	        for (int i = 0; i < raidDamage.size(); i++) {
-	        	int value = raidDamage.get(i);
-	        	if (value > highest)
+	        	BigInteger value = raidDamage.get(i);
+	        	if (value.compareTo(highest) > 0)
 	        		highest = value;
 	        }
-	        highest = makePretty((int)((double)highest * (1 + GRAPH_MARGIN_PERCENT)));
+	        highest = new BigInteger(Integer.toString(makePretty((int)((double)highest.intValue() * (1 + GRAPH_MARGIN_PERCENT)))));
 	        for (int i = 0; i < raidDamage.size(); i++) {
-	        	int value = raidDamage.get(i);
+	        	BigInteger value = raidDamage.get(i);
 	        	double xPerc = (double)i / (double)raidDamage.size();
-	        	double yPerc = (double)value / (double)highest;
+	        	double yPerc = (double)value.intValue() / (double)highest.intValue(); //this is ok for now, until we get to 2B party dps lol
 	        	int x = GRAPH_ORIGIN[0] + (int)(xPerc * GRAPH_DIM[0]);
 	        	int y = GRAPH_ORIGIN[1] + GRAPH_DIM[1] - (int)(yPerc * GRAPH_DIM[1]);
 	        	graphPoints.add(new Point(x, y));
@@ -160,12 +206,16 @@ public class Graph extends AbstractLabel {
     	Point diff = getLocationOnScreen();
     	p.translate((int)(-1 * diff.getX()), (int)(-1 * diff.getY()));
         for (int i = 0; i < graphPoints.size() - 1; i++) { //draw death areas before y markers
-        	boolean dead = deaths.getRawData().get(i);
-        	int x1 = (int)graphPoints.get(i).getX();
-        	int x2 = (int)graphPoints.get(i + 1).getX();
-        	if (dead) {
-            	g2d.setColor(DEATH_GRAY);
-        		g2d.fillRect(x1, GRAPH_ORIGIN[1], x2 - x1, GRAPH_DIM[1]);
+        	try {
+	        	boolean dead = deaths.getRawData().get(i);
+	        	int x1 = (int)graphPoints.get(i).getX();
+	        	int x2 = (int)graphPoints.get(i + 1).getX();
+	        	if (dead) {
+	            	g2d.setColor(DEATH_GRAY);
+	        		g2d.fillRect(x1, GRAPH_ORIGIN[1], x2 - x1, GRAPH_DIM[1]);
+	        	}
+        	} catch (Exception e) {
+        		
         	}
         }
         for (int i = 0; i < GRAPH_Y_MARKERS; i++) {
@@ -189,7 +239,7 @@ public class Graph extends AbstractLabel {
         //draw the numbers on the top
         for (int i = 0; i < GRAPH_Y_MARKERS; i++) {
         	int y = (int)(GRAPH_ORIGIN[1] + GRAPH_DIM[1] * ((double)i / GRAPH_Y_MARKERS));
-            int value = (int)(highest - (((double)i / GRAPH_Y_MARKERS) * highest));
+            int value = (int)(highest.intValue() - (((double)i / GRAPH_Y_MARKERS) * highest.intValue()));
 	        drawNormalText(g2d, Integer.toString(value), FONT_SIZE, GRAPH_ORIGIN[0], y, 1, Color.WHITE, SHADOW_COLOR.darker());
         }
         
@@ -204,11 +254,17 @@ public class Graph extends AbstractLabel {
         else
         	toUse = DEBUFFS;
         	
+        int toShow = ITEMS_PER_PAGE;
+        int toIgnore = ITEMS_PER_PAGE * currentPage;
         for (int i = 0; i < toUse.length; i++) {
 	        DataCollection dc = MainDriver.data.get(toUse[i]);
 	        List<Boolean> data = ((HitMissCollection)(dc)).getRawData();
-	        if (dc.getLast() == 0)
+	        if (dc.getLastInt() <= 0)
 	        	continue;
+	        else if (toIgnore > 0) {
+        		toIgnore--;
+        		continue;
+        	}
 	        boolean hit = false;
 	        int x1 = 0;
         	int x2 = 0;
@@ -247,23 +303,35 @@ public class Graph extends AbstractLabel {
             drawImage(theGraphics, toUse[i].getIcon(), x, y);
             addTooltip(toUse[i], x, y);
             y += BUFF_SPACING;
+            toShow--;
+            if (toShow == 0)
+            	break;
         }
         //add a tooltip for the graph
         if (mouseIndex > -1) {
 	        StringBuilder tooltipText = new StringBuilder();
 	        tooltipText.append(MainDriver.timeToString(tc.getTime(0, mouseIndex)));
-	        tooltipText.append(" - ");
+	        tooltipText.append(" $ - DPS: ");
 	        tooltipText.append(raidDamage.get(mouseIndex));
+	        tooltipText.append(" $ - HP: ");
+	        for (int i = mouseIndex; i > 0; i--) {
+	        	if (hp.get(mouseIndex) != null) {
+	        		tooltipText.append(hp.get(mouseIndex));
+	        		break;
+	        	}
+	        	if (i == 0)
+	        		tooltipText.append("---");
+	        }
 	    	Tooltip toAdd = new Tooltip(GRAPH_ORIGIN[0], GRAPH_ORIGIN[1], "Party DPS", tooltipText.toString(), GRAPH_DIM[0], GRAPH_DIM[1]);
-	    	for (Tooltip tp : ((Report)myFrame).tooltipMappings.keySet()) {
+	    	for (Tooltip tp : ((GraphFrame)myFrame).tooltipMappings.keySet()) {
 	    		if (tp.getTitle().contains("Party DPS")) {
-	    			((Report)myFrame).tooltipMappings.remove(tp);
+	    			((GraphFrame)myFrame).tooltipMappings.remove(tp);
 	    			break;
 	    		}
 	    	}
-	    	((Report)myFrame).tooltipMappings.put(toAdd, false);
+	    	((GraphFrame)myFrame).tooltipMappings.put(toAdd, false);
         }
     	
-        ((Report)myFrame).drawTooltips(theGraphics, this);
+        ((GraphFrame)myFrame).drawTooltips(theGraphics, this);
     }
 }

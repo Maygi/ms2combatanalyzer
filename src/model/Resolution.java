@@ -41,6 +41,7 @@ public class Resolution {
 	 * @param sizes
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private List<Integer[]> derive(List<Integer[]> points) {
 		List<Integer[]> toReturn = new ArrayList<Integer[]>();
 		for (int i = 0; i < points.size(); i++) {
@@ -59,17 +60,36 @@ public class Resolution {
 	
 	private void initialize() {
 		//configure 1920x1080 sizes. region sizes should be similar
+		
 		baseRegion = new ArrayList<Integer[]>();
-		baseRegion.add(new Integer[]{640, 130, 1330, 240});
-		baseRegion.add(new Integer[]{630, 0, 730, 55});
-		baseRegion.add(new Integer[]{550, 740, 890, 890});
-		baseRegion.add(new Integer[]{1000, 750, 1300, 900});
-		baseRegion.add(new Integer[]{1099, 76, 1099 + 198, 76 + 29});
-		baseRegion.add(new Integer[]{643, 77, 685, 102});
-		baseRegion.add(new Integer[]{950, 840, 1050, 1030});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 390), 125,
+				(int) (screenSize.getWidth() / 2 + 390), 220});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 400), 0,
+				(int) (screenSize.getWidth() / 2), 55});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 410), (int) (screenSize.getHeight() - 300),
+				(int) (screenSize.getWidth() / 2 - 60), (int) (screenSize.getHeight() - 195)});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 60), (int) (screenSize.getHeight() - 300),
+				(int) (screenSize.getWidth() / 2 + 360), (int) (screenSize.getHeight() - 195)});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 140), 76,
+				(int) (screenSize.getWidth() / 2 + 140 + 198), 76 + 29});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 315), 77,
+				(int) (screenSize.getWidth() / 2 - 275), 102});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 10), (int) (screenSize.getHeight() - 255),
+				(int) (screenSize.getWidth() / 2 + 50), (int) (screenSize.getHeight() - 185)});
+		
+		//baseRegion.add(new Integer[]{640, 130, 1330, 240});		
+		//baseRegion.add(new Integer[]{630, 0, 730, 55});
+		//baseRegion.add(new Integer[]{550, 740, 890, 890});
+		//baseRegion.add(new Integer[]{1000, 750, 1300, 900});
+		//baseRegion.add(new Integer[]{1099, 76, 1099 + 198, 76 + 29});
+		//baseRegion.add(new Integer[]{643, 77, 685, 102});
+		//baseRegion.add(new Integer[]{950, 840, 1050, 1030});
 		
 		//...just now realized that this could probably be a better way of handling things. might normalize the above later
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 40), 0, (int) (screenSize.getWidth() / 2 + 40), (int) (screenSize.getHeight() / 2)});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 75), (int) (screenSize.getHeight() - 135),
+				(int) (screenSize.getWidth() / 2), (int) (screenSize.getHeight() - 100)});
+		/*baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 40), 0,
+									(int) (screenSize.getWidth() / 2 + 40), (int) (screenSize.getHeight() / 2)});*/
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 300), (int) (screenSize.getHeight() / 8), 
 									(int) (screenSize.getWidth() / 2 + 300), (int) (screenSize.getHeight() / 2)});
 		
@@ -83,7 +103,9 @@ public class Resolution {
 		}
 		
 		regions = new ArrayList<Integer[]>(); 
-		if (screenSize.getWidth() == 1920 && screenSize.getHeight() == 1080) {
+		match = true;
+		regions = baseRegion;
+		/*if (screenSize.getWidth() == 1920 && screenSize.getHeight() == 1080) {
 			match = true;
 			regions = baseRegion;
 		} else if (screenSize.getWidth() == 3440 && screenSize.getHeight() == 1440) {
@@ -115,7 +137,7 @@ public class Resolution {
 		} else { //1920x1080
 			match = false;
 			regions = baseRegion;
-		}
+		}*/
 	}
 	
 	/**

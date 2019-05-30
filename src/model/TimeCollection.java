@@ -1,5 +1,6 @@
 package model;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,23 +77,24 @@ public class TimeCollection extends DataCollection {
 			DPSCollection dps = ((DPSCollection)MainDriver.data.get(TrackPoint.HOLY_SYMBOL_DAMAGE));
 			int hsDuration = dps.getAverageHSTime();
 			int lastHS = MainDriver.getEllaspedTime(getTime(dps.getLastHSTime())); 
-			int hsDPS = dps.getHSDPS();
+			BigInteger hsDPS = dps.getHSDPS();
 			int avgDPS = dps.getAverageDPS();
-			int hp = MainDriver.data.get(TrackPoint.HP).getLast();
-			if (hp <= 1)
+			BigInteger hp = MainDriver.data.get(TrackPoint.HP).getLast();
+			if (hp == null || hp.compareTo(BigInteger.ONE) <= 0)
 				return lastReading;
 			if (avgDPS == 0) //not enough data
 				return 0;
-			int rough = MainDriver.getEllaspedTime() + (hp / avgDPS);
+			int rough = MainDriver.getEllaspedTime() + (hp.divide(new BigInteger(Integer.toString(avgDPS)))).intValue();
 			int calcTime = Math.min(rough, MAX_RAID_TIME);
 			int hsCastsLeft = (calcTime - lastHS) / HS_CD;
 			double hsWeight = ((double)hsDuration * hsCastsLeft) / (double)rough;
-			int avgRealDPS = (int)((double)(avgDPS * (1.0 - hsWeight)) + (double)hsDPS * hsWeight);
-			int real = MainDriver.getEllaspedTime() + (hp / avgRealDPS);
+			int avgRealDPS = (int)((double)(avgDPS * (1.0 - hsWeight)) + (double)hsDPS.intValue() * hsWeight);
+			int real = MainDriver.getEllaspedTime() + (hp.divide(new BigInteger(Integer.toString(avgRealDPS)))).intValue();
 			//System.out.println("HS Duration: "+hsDuration+"; HS DPS: "+hsDPS+"; AVG DPS: "+avgDPS+"; HP: "+hp+"; Real DPS: "+avgRealDPS+"; HS casts left: "+hsCastsLeft);
 			lastReading = real;
 			return real;
 		} catch (Exception e) {
+			//e.printStackTrace();
 			return 0;
 		}
 	}

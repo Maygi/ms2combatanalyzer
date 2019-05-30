@@ -1,4 +1,5 @@
 package model;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,7 +8,16 @@ import java.util.List;
  * @author May
  */
 public class DataCollection {
-	protected List<Integer> data;
+	
+	public static final int USE_BIG = 0;
+	public static final int USE_INT = 1;
+	public static final int USE_STRING = 2;
+	
+	private int useMode;
+	
+	
+	protected List<BigInteger> data;
+	protected List<Integer> intData;
 	protected List<String> stringData;
 	
 	/**
@@ -15,8 +25,10 @@ public class DataCollection {
 	 * Most DataCollections will use integers; some will use strings.
 	 */
 	public DataCollection() {
-		data = new ArrayList<Integer>();
+		data = new ArrayList<BigInteger>();
+		intData = new ArrayList<Integer>();
 		stringData = new ArrayList<String>();
+		useMode = 0;
 	}
 	
 	public void equalize(int length) {
@@ -34,10 +46,29 @@ public class DataCollection {
 	
 	public void addData(String value) {
 		stringData.add(value);
+		useMode = USE_STRING;
 	}
 	
-	public void addData(int value) {
+	public void addData(Integer value) {
+		intData.add(value);
+		useMode = USE_INT;
+	}
+	
+	public void addData(BigInteger value) {
 		data.add(value);
+		useMode = USE_BIG;
+	}
+	
+	public List<String> getStringData() {
+		return stringData;
+	}
+	
+	public List<Integer> getIntData() {
+		return intData;
+	}	
+	
+	public List<BigInteger> getData() {
+		return data;
 	}
 
 	public String getLastString() {
@@ -45,20 +76,35 @@ public class DataCollection {
 			return stringData.get(stringData.size() - 1);
 		return null;
 	}
-	public List<String> getStringData() {
-		return stringData;
-	}
 	
-	public List<Integer> getData() {
-		return data;
-	}
-	public Integer getLast() {
-		if (data.size() > 0)
-			return data.get(data.size() - 1);
+	public Integer getLastInt() {
+		if (intData.size() > 0)
+			return intData.get(intData.size() - 1);
 		return 0;
 	}
 	
+	public BigInteger getLast() {
+		if (data.size() > 0)
+			return data.get(data.size() - 1);
+		return BigInteger.ZERO;
+	}
+	
+	public String getLastAsString() {
+		switch(useMode) {
+			case USE_BIG:
+				return getLast().toString();
+			case USE_INT:
+				return Integer.toString(getLastInt());
+			case USE_STRING:
+				return getLastString();
+		}
+		return "";
+	}
+	
 	public void reset() {
-		data = new ArrayList<Integer>();
+		data = new ArrayList<BigInteger>();
+		intData = new ArrayList<Integer>();
+		stringData = new ArrayList<String>();
+		useMode = 0;
 	}
 }
