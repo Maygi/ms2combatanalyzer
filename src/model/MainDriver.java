@@ -33,7 +33,7 @@ import util.VersionCheck;
  */
 public class MainDriver {
 	
-	public static final String VERSION = "1.31";
+	public static final String VERSION = "1.32";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -92,7 +92,7 @@ public class MainDriver {
 		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", Resolution.BUFFS, 0.995, ClassConstants.PRIEST),
 		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", Resolution.BUFFS, 0.99, ClassConstants.ARCHER),
 		BRONZE_EAGLE("Bronze Eagle", "Increases Dexterity", "bronzeeagle.png", Resolution.BUFFS, 0.9995, ClassConstants.ARCHER),
-		EAGLES_MAJESTY("Eagle's Majesty", "Restores SP per second, and Bronze Eagle deals additional damage on hit", "eaglesmajesty.png", Resolution.BUFFS, 0.99, ClassConstants.ARCHER),
+		EAGLES_MAJESTY("Eagle's Majesty", "Restores SP per second, and Bronze Eagle deals additional damage on hit", "eaglesmajesty.png", Resolution.BUFFS, 0.995, ClassConstants.ARCHER),
 		FATAL_STRIKES("Fatal Strikes", "All attacks deal critical damage", "fatalstrikes.png", Resolution.BUFFS, 0.999, ClassConstants.ASSASSIN),
 		DARKAURA("Dark Aura", "Increases spirit regen, stacking up to 10 times on hit", "darkaura.png", Resolution.BUFFS, 0.99, ClassConstants.BERSERKER),
 		RETALIATION("Retaliation", "Increases physical and magic attack as well as evasion", "retaliation.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),

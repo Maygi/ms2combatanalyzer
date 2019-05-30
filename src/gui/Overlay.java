@@ -71,6 +71,8 @@ public class Overlay extends AbstractLabel {
     	TrackPoint.FLAME_WAVE, TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
     	TrackPoint.PERFECT_STORM, TrackPoint.FROST, TrackPoint.CHILL,
     	
+    	TrackPoint.VISION_TORRENT,
+    	
     	TrackPoint.OVERCOME, TrackPoint.FIGHTING_SPIRIT, TrackPoint.PATTERN_BREAK,
     	TrackPoint.MERIDIAN_FLOW, TrackPoint.MERIDIAN_FLOW2, TrackPoint.MERIDIAN_FLOW3,
     	
