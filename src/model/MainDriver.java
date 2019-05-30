@@ -28,7 +28,7 @@ import util.VersionCheck;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.31
+ * Version 1.3.2
  * @author May
  */
 public class MainDriver {
