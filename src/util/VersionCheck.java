@@ -41,19 +41,28 @@ public class VersionCheck {
 	public static boolean needsUpdate() {
 		String current = MainDriver.VERSION;
 		String live = MainDriver.liveVersion;
-		String[] currentParts = current.split(".");
-		String[] liveParts = live.split(".");
+		return !latestVersion(current, live);
+	}
+	
+	public static boolean latestVersion(String base, String compare) {
+		String current = base;
+		String live = compare;
+		String[] currentParts = current.split("\\.");
+		String[] liveParts = live.split("\\.");
 		for (int i = 0; i < currentParts.length; i++) {
 			int realCurrent = Integer.parseInt(currentParts[i]);
 			if (i >= liveParts.length) { //maybe we have current 1.3.1 vs live 1.3?
-				return false;
+				return true;
 			} else {
 				int realLive = Integer.parseInt(liveParts[i]);
-				if (realCurrent < realLive)
+				if (realCurrent < realLive) {
+					return false;
+				} else if (realCurrent > realLive) {
 					return true;
+				}
 			}
 		}
-		return false;
+		return true;
 	}
 	
 	/**
@@ -61,13 +70,25 @@ public class VersionCheck {
 	 * @return The current version from the Git tag API.
 	 */
 	public static String getVersion() {
-		String json = getJSon(URL);
-		int index = json.indexOf("\"name\":\"");
-		json = json.substring(index + 8, json.length());
-		index = json.indexOf("\"");
-		json = json.substring(0, index);
-		json = json.toUpperCase();
-		json = json.replaceAll("MSCA", "");
-		return json;
+		String raw = getJSon(URL);
+		String latest = "1.0";
+		while (raw.contains("\"name\":\"")) {
+			int index = raw.indexOf("\"name\":\"");
+			raw = raw.substring(index + 8, raw.length());
+			String json = raw;
+			index = json.indexOf("\"");
+			json = json.substring(0, index);
+			json = json.toUpperCase();
+			json = json.replaceAll("MSCA", "");
+			if (latestVersion(json, latest))
+				latest = json;
+			if (raw.contains("},")) {
+				index = raw.indexOf("},") + 2;
+				raw = raw.substring(index, raw.length());
+			} else { //reached the end
+				break;
+			}
+		}
+		return latest;
 	}
 }
