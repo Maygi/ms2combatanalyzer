@@ -24,12 +24,16 @@ public enum Sound {
     STATUS_WARNING("statusalert"),
     HOVER("hover"),
     PROC("proc"),
-    PROC2("proc2");
+    PROC2("proc2", 6),
+    OK("ok"),
+    STATUS_WARNING2("warning", -5);
     
     /**
      * A clip to play the sound effect.
      */
     private Clip myClip;
+    
+    private int myVolume;
     
     /**
      * Initializes the sound.
@@ -41,6 +45,25 @@ public enum Sound {
                                                      "sound/" + theName + ".wav"));
             myClip = AudioSystem.getClip();
             myClip.open(stream);
+            myVolume = 0;
+        } catch (final IOException | LineUnavailableException
+                        | UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Initializes the sound with a set volume.
+     * @param theName The name of the sound.
+     * @param theVolume The volume.
+     */
+    Sound(final String theName, final int theVolume) {
+        try {
+            final AudioInputStream stream = AudioSystem.getAudioInputStream(new File(
+                                                     "sound/" + theName + ".wav"));
+            myClip = AudioSystem.getClip();
+            myClip.open(stream);
+            myVolume = theVolume;
         } catch (final IOException | LineUnavailableException
                         | UnsupportedAudioFileException e) {
             e.printStackTrace();
@@ -58,7 +81,7 @@ public enum Sound {
      * Plays the sound at the default volume.
      */
     public void play() {
-    	play(0);
+    	play(myVolume);
     }
     
     /**

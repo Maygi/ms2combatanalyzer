@@ -28,12 +28,12 @@ import util.VersionCheck;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.3.2
+ * Version 1.3.3
  * @author May
  */
 public class MainDriver {
 	
-	public static final String VERSION = "1.32";
+	public static final String VERSION = "1.33";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -70,7 +70,7 @@ public class MainDriver {
 		RAGING_TEMPEST("Raging Tempest", "Decreases target's evasion and accuracy", "ragingtempest.png", Resolution.BOSS_DEBUFFS, 0.999),
 
 		//buffs
-		BLESSINGS("Celestial Blessings", "Increases damage and resistance", "blessings.png", Resolution.BUFFS, 0.9),
+		BLESSINGS("Celestial Blessings", "Increases physical/magic attack and resistance", "blessings.png", Resolution.BUFFS, 0.9),
 		FOCUSSEAL("Focus Seal", "Increases physical/magic attack", "focusseal.png", Resolution.BUFFS, 0.9995),
 		WARHORN("Warhorn", "Increases physical/magic attack", "warhorn.png", Resolution.BUFFS, 0.999),
 		HONINGRUNES("Honing Runes", "Increases critical damage", "honingrunes.png", Resolution.BUFFS, 0.999),
@@ -88,6 +88,7 @@ public class MainDriver {
 		
 		//personal buffs
 		IRON_DEFENSE("Iron Defense", "Increases SP regen, and decreases damage taken and dealt", "irondefense.png", Resolution.BUFFS, ClassConstants.KNIGHT),
+		DUAL_TACTICS("Dual Tactics - Offense", "10% increased damage when health is above 70%", "dualtactics.png", Resolution.BUFFS, ClassConstants.KNIGHT),
 		SHIELD_MASTERY("Shield Mastery", "Increases damage after a successful block", "shieldmastery.png", Resolution.BUFFS, 0.999, ClassConstants.KNIGHT),
 		GUARDIAN("Celestial Guardian", "Increases magic attack", "guardian.png", Resolution.BUFFS, 0.995, ClassConstants.PRIEST),
 		SNIPE("Snipe", "Increases spirit regen when no enemies are nearby", "snipe.png", Resolution.BUFFS, 0.99, ClassConstants.ARCHER),
@@ -96,14 +97,16 @@ public class MainDriver {
 		FATAL_STRIKES("Fatal Strikes", "All attacks deal critical damage", "fatalstrikes.png", Resolution.BUFFS, 0.999, ClassConstants.ASSASSIN),
 		DARKAURA("Dark Aura", "Increases spirit regen, stacking up to 10 times on hit", "darkaura.png", Resolution.BUFFS, 0.99, ClassConstants.BERSERKER),
 		RETALIATION("Retaliation", "Increases physical and magic attack as well as evasion", "retaliation.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),
-		MESOGUARD("Mesoguard Plus", "Increases physical and magic attack ", "mesoguard.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),
+		MESOGUARD("Mesoguard Plus", "Increases physical and magic attack ", "mesoguard.png", Resolution.BUFFS, 0.995, ClassConstants.THIEF),
 		HASTE("Haste", "Increases attack speed, movement speed, physical attack, and magic attack", "haste.png", Resolution.BUFFS, 0.999, ClassConstants.THIEF),
 		
 		// lapentiers
 		ROOTED_STRENGTH("Rooted Strength", "Increases damage by 30% but reduces movement speed by 80%", "rootedstrength.png", Resolution.BUFFS, 0.999),
 		
 		// lapenshards
+		BJORNS_ARTISTRY("Bjorn's Artistry", "Increases attack speed", "bjornsartistry.png", Resolution.BUFFS, 0.999),
 		PINK_BEANS_PRANK("Pink Bean's Prank", "Increases physical and magic attack", "pinkbeansprank.png", Resolution.BUFFS, 0.999),
+		LUMARIGONS_PRIDE("Lumarigon's Pride", "Increases physical and magic attack, but decreases defense", "lumarigonspride.png", Resolution.BUFFS, 0.999),
 		
 		//wizard awakening
 		FLAME_IMP("Flame Imp", "Embers will always crit. Chance to reset BBQ party on crit.", "playingwithfire.png", Resolution.BUFFS, 0.999, ClassConstants.WIZARD),
@@ -115,12 +118,12 @@ public class MainDriver {
 		CHILL("Chill", "Target takes bonus damage from thunderbolt", "chill.png", Resolution.BOSS_DEBUFFS, 0.9995, ClassConstants.WIZARD),
 		
 		//sb awakening
-		SOUL_DISSONANCE("Soul Dissonance", "Decreases evasion and critical evasion of target", "souldissonance.png", Resolution.BOSS_DEBUFFS, 0.999),
-		SOUL_FLOCK("Soul Flock", "Decreases defense of target", "soulflock.png", Resolution.BOSS_DEBUFFS, 0.999),
+		SOUL_DISSONANCE("Soul Dissonance", "Decreases evasion and critical evasion of target", "souldissonance.png", Resolution.BOSS_DEBUFFS, 0.998),
+		SOUL_FLOCK("Soul Flock - 5 stacks", "Decreases defense of target", "soulflock5-1.png", "soulflock5-2.png", Resolution.BOSS_DEBUFFS, 0.7),
 		VISION_TORRENT("Vision Torrent", "Increases magic attack and enhances skills", "visiontorrent.png", Resolution.BUFFS, 0.999, ClassConstants.SOUL_BINDER),
 		
 		//priest awakening
-		ARIELS_WINGS("Ariel's Wings", "Decreases defense of target", "arielswings.png", Resolution.BOSS_DEBUFFS, 0.999),
+		ARIELS_WINGS("Ariel's Wings", "Decreases defense of target", "arielswings.png", "arielswings2.png", Resolution.BOSS_DEBUFFS, 0.999),
 		PURIFYING_LIGHT("Purifying Light", "Decreases defense of target", "purifyinglight.png", Resolution.BOSS_DEBUFFS, 0.999),
 		VITALITY("Vitality", "Increased physical and magic attack", "vitality.png", Resolution.BUFFS, 0.999),
 		GREATER_HEAL("Greater Heal", "Restoring health over time. 50% of this uptime is a damage buff", "greaterheal.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
@@ -129,9 +132,9 @@ public class MainDriver {
 		//archer awakening
 		FLAME_ARROW_1("Flame Arrow I", "Multi-drive shot I is ready", "flamearrow1.png", Resolution.BUFFS, 0.8, ClassConstants.ARCHER),
 		FLAME_ARROW_2("Flame Arrow II", "Multi-drive shot II is ready", "flamearrow2.png", Resolution.BUFFS, 0.8, ClassConstants.ARCHER),
-		WIND_DRAW("Full Wind Draw", "Archer's secrets is ready", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
+		WIND_DRAW("Full Wind Draw", "Archer's secrets is ready", "winddraw.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
 		RANGERS_FOCUS("Ranger's Focus", "Increases physical attack and enables Flame Arrow IV", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
-		ARCHERS_SECRETS("Archer's Secrets", "Increases piercing and accuracy, and enables enhanced skills", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
+		ARCHERS_SECRETS("Archer's Secrets", "Increases piercing and accuracy, and enables enhanced skills", "archerssecrets.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
 		GREATER_SHARP_EYES("Greater Sharp Eyes", "Increases physical attack of caster", "greatersharpeyes.png", Resolution.BUFFS, 0.999),
 		
 		//knight awakening
@@ -139,6 +142,7 @@ public class MainDriver {
 		DIVINE_RETRIBUTION("Divine Retribution", "Increases physical/magical attack, but decreases defense and disables shield skills", "divineretribution.png", Resolution.BUFFS, 0.9995, ClassConstants.KNIGHT),
 		
 		//assassin awakening
+		DARK_MIRE("Dark Mire", "Increases dark damage", "darkmire.png", Resolution.BUFFS, 0.999, ClassConstants.ASSASSIN),
 		SHADOW_STANCE("Shadow Stance", "Increases dark damage while the shield holds", "shadowstance.png", Resolution.BUFFS, 0.999, ClassConstants.ASSASSIN),
 		
 		//berserker awakening
@@ -147,9 +151,16 @@ public class MainDriver {
 		RAGING_SOUL("Raging Soul", "Increased attack speed, physical attack, and dark damage", "ragingsoul.png", Resolution.BUFFS, 0.999, ClassConstants.BERSERKER),
 		
 		//striker
-		OVERCOME("Overcome", "Increases attack speed, movement speed, physical attack, and magic attack", "bloodfury.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
-		FIGHTING_SPIRIT("Fighting Spirit - Vengeance", "Increased damage", "vengeance.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		PATTERN_BREAK_DEBUFF("Pattern Break (Debuff)", "Decreases evasion", "patternbreakdebuff.png", Resolution.BOSS_DEBUFFS, 0.999),
+		CENTERED_MIND("Centered Mind", "Increases damage when Spirit is above 50%", "centeredmind.png", Resolution.BUFFS, 0.99, ClassConstants.STRIKER),
+		FEINTING_GUARD("Feinting Guard", "Increases punch/kick skill damage", "feintingguard.png", Resolution.BUFFS, 0.9995, ClassConstants.STRIKER),
+		FEINTING_GUARD_EX("Feinting Guard EX", "Increases punch/kick skill damage", "feintingguardex.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		OVERCOME("Overcome", "Increases attack speed, movement speed, physical attack, and magic attack", "overcome.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		FIGHTING_SPIRIT("Fighting Spirit", "Increased resistance and decreased movement speed. Grants Vengeance when hit.", "fightingspirit.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		VENGEANCE("Fighting Spirit - Vengeance", "Increased damage", "vengeance.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		VENGEANCE_MAX("Fighting Spirit - Vengeance x12", "Increased damage - maximum stacks", "vengeance12.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
 		PATTERN_BREAK("Pattern Break", "Increases accuracy", "patternbreak.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
+		CONFIDENCE("Confidence", "Increases attack speed and physical attack", "confidence.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
 		MERIDIAN_FLOW("Meridian Flow I", "Increases physical attack, attack speed, and restores SP over time", "meridianflow1.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
 		MERIDIAN_FLOW2("Meridian Flow II", "Increases physical attack, attack speed, and restores SP over time", "meridianflow2.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
 		MERIDIAN_FLOW3("Meridian Flow III", "Increases physical attack, attack speed, and restores SP over time", "meridianflow3.png", Resolution.BUFFS, 0.999, ClassConstants.STRIKER),
@@ -178,6 +189,8 @@ public class MainDriver {
 		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "dead.png", Resolution.TOMBSTONE, 0.99),
 		//TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
 		INFERNOG_BOMB("Infernog Blue Bomb", "Drops a puddle when the timer ends", "infernogbomb.png", Resolution.DEBUFFS, 0.99),
+		PB_DANCE("Pink Bean - Dance", "Explode with music periodically", "pbdance.png", Resolution.DEBUFFS, 0.99),
+		PB_REFLECT("Pink Bean - Reflect", "Take 99% less damage and reflect damage", "pbreflect.png", Resolution.DEBUFFS, 0.99),
 		BOSS_HEAL("Boss Healing", "Number of times the boss healed", "bossheal.png", Resolution.BOSS_BUFFS, 0.95),
 		SHIELD("Shield Uptime", "Reduces damage taken by 50%", "shield.png", Resolution.BOSS_BUFFS),
 		SHIELD2("2x Shield Uptime", "Reduces damage taken by 80%", "doubleshield.png", Resolution.BOSS_BUFFS),
@@ -481,11 +494,11 @@ public class MainDriver {
         data.put(TrackPoint.POISON_EDGE, new HitMissCollection());
         data.put(TrackPoint.POISON_VIAL, new HitMissCollection());
         data.put(TrackPoint.RAGING_TEMPEST, new HitMissCollection());
-        data.put(TrackPoint.STATIC_FLASH, new HitMissCollection(TrackPoint.STATIC_FLASH_AMP));
         data.put(TrackPoint.MOD, new HitMissCollection(TrackPoint.MOD_AMP));
         data.put(TrackPoint.SHIELDTOSS, new HitMissCollection(TrackPoint.SHIELDTOSS_AMP));
         data.put(TrackPoint.FLAME_WAVE, new HitMissCollection());
         data.put(TrackPoint.IRON_DEFENSE, new HitMissCollection());
+        data.put(TrackPoint.DUAL_TACTICS, new HitMissCollection());
         data.put(TrackPoint.DARKAURA, new HitMissCollection());
         data.put(TrackPoint.SNIPE, new HitMissCollection());
         data.put(TrackPoint.EAGLES_MAJESTY, new HitMissCollection());
@@ -508,6 +521,8 @@ public class MainDriver {
         data.put(TrackPoint.TOMBSTONE, new HitMissCollection());
         data.put(TrackPoint.VARR_WINGS, new HitMissCollection(Sound.PROC, 10));
         data.put(TrackPoint.INFERNOG_BOMB, new HitMissCollection(Sound.STATUS_WARNING, 11));
+        data.put(TrackPoint.PB_DANCE, new HitMissCollection(Sound.STATUS_WARNING, 11));
+        data.put(TrackPoint.PB_REFLECT, new HitMissCollection(Sound.STATUS_WARNING2, 11));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE, new DPSCollection((HitMissCollection)data.get(TrackPoint.HOLY_SYMBOL), 
             	(DeltaCollection)data.get(TrackPoint.RAID_DPS)));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW, new DeltaCollection(data.get(TrackPoint.HP), 1, DeltaCollection.DAMAGE_AMP)); //assumes max level
@@ -521,10 +536,11 @@ public class MainDriver {
         data.put(TrackPoint.GREATER_SHARP_EYES, new HitMissCollection());
         
         //assassin awakening
-        /*data.put(TrackPoint.SHADOW_STANCE, new HitMissCollection());
+        data.put(TrackPoint.DARK_MIRE, new HitMissCollection());
+        data.put(TrackPoint.SHADOW_STANCE, new HitMissCollection());
         
         //berserker awakening
-        data.put(TrackPoint.BLOOD_FURY, new HitMissCollection());
+        /*data.put(TrackPoint.BLOOD_FURY, new HitMissCollection());
         data.put(TrackPoint.RUTHLESS, new HitMissCollection(Sound.PROC2, 2));
         data.put(TrackPoint.RAGING_SOUL, new HitMissCollection());*/
         
@@ -537,7 +553,7 @@ public class MainDriver {
         data.put(TrackPoint.ARIELS_WINGS, new HitMissCollection(TrackPoint.ARIELS_WINGS_AMP));
         data.put(TrackPoint.ARIELS_WINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.05, DeltaCollection.DEFENSE_DEBUFF));
         data.put(TrackPoint.PURIFYING_LIGHT, new HitMissCollection(TrackPoint.PURIFYING_LIGHT_AMP));
-        data.put(TrackPoint.PURIFYING_LIGHT_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.06, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.PURIFYING_LIGHT_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.06, DeltaCollection.DAMAGE_AMP)); //assumes max level
         data.put(TrackPoint.HEAVENS_WRATH, new HitMissCollection());
         data.put(TrackPoint.GREATER_HEAL, new HitMissCollection());
         data.put(TrackPoint.VITALITY, new HitMissCollection());
@@ -547,14 +563,23 @@ public class MainDriver {
         data.put(TrackPoint.SOUL_FLOCK, new HitMissCollection(TrackPoint.SOUL_FLOCK_AMP));
         data.put(TrackPoint.SOUL_FLOCK_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.15, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.VISION_TORRENT, new HitMissCollection());
+
+        data.put(TrackPoint.STATIC_FLASH, new HitMissCollection(TrackPoint.STATIC_FLASH_AMP));
         
         //striker
-       /* data.put(TrackPoint.OVERCOME, new HitMissCollection());
+        data.put(TrackPoint.PATTERN_BREAK_DEBUFF, new HitMissCollection());
+        data.put(TrackPoint.CENTERED_MIND, new HitMissCollection());
+        data.put(TrackPoint.FEINTING_GUARD, new HitMissCollection());
+        data.put(TrackPoint.FEINTING_GUARD_EX, new HitMissCollection());
+        data.put(TrackPoint.VENGEANCE, new HitMissCollection());
+        data.put(TrackPoint.VENGEANCE_MAX, new HitMissCollection());
+        data.put(TrackPoint.CONFIDENCE, new HitMissCollection());
+        data.put(TrackPoint.OVERCOME, new HitMissCollection());
         data.put(TrackPoint.FIGHTING_SPIRIT, new HitMissCollection());
         data.put(TrackPoint.PATTERN_BREAK, new HitMissCollection());
         data.put(TrackPoint.MERIDIAN_FLOW, new HitMissCollection());
         data.put(TrackPoint.MERIDIAN_FLOW2, new HitMissCollection());
-        data.put(TrackPoint.MERIDIAN_FLOW3, new HitMissCollection());*/
+        data.put(TrackPoint.MERIDIAN_FLOW3, new HitMissCollection());
         
         //thief
         data.put(TrackPoint.RETALIATION, new HitMissCollection());
@@ -572,6 +597,8 @@ public class MainDriver {
         
         data.put(TrackPoint.ROOTED_STRENGTH, new HitMissCollection());
         data.put(TrackPoint.PINK_BEANS_PRANK, new HitMissCollection());
+        data.put(TrackPoint.BJORNS_ARTISTRY, new HitMissCollection());
+        data.put(TrackPoint.LUMARIGONS_PRIDE, new HitMissCollection());
     	trackPointByRegion = new TreeMap<Integer, List<TrackPoint>>();
     	for (TrackPoint tp : data.keySet()) {
     		int region = tp.getRegionIndex();
@@ -731,7 +758,7 @@ public class MainDriver {
     }
     
     public static boolean isClose(BigInteger one, BigInteger two) {
-    	if (one.subtract(two).abs().compareTo(new BigInteger("5000000")) <= 0)
+    	if (one.subtract(two).abs().compareTo(new BigInteger("10000000")) <= 0)
     		return true;
     	BigInteger bigger, smaller;
     	if (one.compareTo(two) > 0) {
@@ -747,10 +774,14 @@ public class MainDriver {
     }
     
     public static void tick() {
+    	BigInteger one = new BigInteger("1531081794");
+    	BigInteger two = new BigInteger("523314638");
+    	//System.out.println("WILL IT BLEND?" +isClose(one, two));
         //double timeMultiplier = ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTimeMultiplier();
         //System.out.println("Multiplier: "+timeMultiplier);
         Screen s = new Screen();
         int shields = 0;
+        boolean dissonance = false;
         currentTick++;
         if (currentTick % 10 == 0 && active) {
         	//equalize();
@@ -798,9 +829,9 @@ public class MainDriver {
 		    			m = r.exists(tp.getSecondaryImage(), 0.01);
 		    		}
 	    		}
-	    		/*if (tp.getName().contains("Mark of") && m != null) {
+	    		if (tp.getName().contains("Soul Flock") && m != null) {
 	    			System.out.println(tp.getName()+": "+m.getScore());
-	    		}*/
+	    		}
 				hit = m != null && m.getScore() >= tp.getThreshold();
 				if (tp.getName().contains("Dungeon Complete") && hit) {
 					pause();
@@ -809,6 +840,10 @@ public class MainDriver {
 				if (hit && tp.getClassIndex() >= 0) {
 					activeClass = tp.getClassIndex();
 				}
+				if (tp.getName().contains("Static Flash") && hit && dissonance)
+					hit = false;
+				if (tp.getName().contains("Dissonance") && hit)
+					dissonance = true;
 				if (tp.getName().contains("Holy Symbol") && hit)
 					((DeltaCollection)data.get(TrackPoint.HOLY_SYMBOL_DAMAGE_RAW)).handleHit(true);
 				if (tp.getName().contains("Shield Uptime") && hit)
@@ -855,32 +890,39 @@ public class MainDriver {
     	        String[] text = r.text().split("\n");
     	        //String text = ocr.read(new Rectangle(region[0], region[1], region[2], region[3]));
     	        BigInteger value = null;
-    	        for (String string : text) {
-    	        	try {
-    	        		value = new BigInteger(string);
-    	        		if (!isClose(value, lastHPReading)) { //bad reading
-    	        	        if (dc.getData().size() < 5) {
-    	        	        	if (secondReading == null) { //could the next reading be more accurate, perhaps?
-	    	        	        	secondReading = value;
-	    	        	        	value = null;
-    	        	        	} else {
-    	        	        		if (isClose(value, secondReading)) { //second reading is better
-    	        	        			lastHPReading = secondReading;
-    	        	        		} else { //second reading is not better
-    	        	        			secondReading = value;
-    	        	        			value = null;
-    	        	        		}
-    	        	        	}
-    	        	        } else {
-        	        			System.out.println("BAD READING! "+value.toString()+"; last: "+lastHPReading.toString());
-        	        			value = null;
-    	        	        }
-    	        		} else {
-    	        			lastHPReading = value;
-    	        		}
-    	        	} catch (Exception e) {
-    	        		//e.printStackTrace();
-    	        	}
+    	        if (tp.getName().contains("HP")) {
+	    	        for (String string : text) {
+	    	        	try {
+	    	        		value = new BigInteger(string);
+	    	        		if (!isClose(value, lastHPReading)) { //bad reading
+	    	        	        if (dc.getData().size() < 5) {
+	        	        			logOutput.println("BAD READING! Data is <5.");
+	        	        			logOutput.println(dc.getData().toString());
+	    	        	        	if (secondReading == null) { //could the next reading be more accurate, perhaps?
+		    	        	        	secondReading = value;
+		    	        	        	value = null;
+		        	        			logOutput.println("SecondReading is null. Setting to: "+value);
+	    	        	        	} else {
+	    	        	        		if (isClose(value, secondReading)) { //second reading is better
+	    	        	        			lastHPReading = secondReading;
+			        	        			logOutput.println("SecondReading, which was "+secondReading.toString()+", is better. Value: "+value.toString());
+	    	        	        		} else { //second reading is not better
+	    	        	        			secondReading = value;
+	    	        	        			value = null;
+			        	        			logOutput.println("SecondReading, which was "+secondReading.toString()+", is not better.");
+	    	        	        		}
+	    	        	        	}
+	    	        	        } else {
+	        	        			logOutput.println("BAD READING! "+value.toString()+"; last: "+lastHPReading.toString());
+	        	        			value = null;
+	    	        	        }
+	    	        		} else {
+	    	        			lastHPReading = value;
+	    	        		}
+	    	        	} catch (Exception e) {
+	    	        		//e.printStackTrace();
+	    	        	}
+	    	        }
     	        }
     	        if (value != null && tp.getName().contains("HP") && !active) {
     	        	int[] regionBoss = TrackPoint.BOSS.getRegion();

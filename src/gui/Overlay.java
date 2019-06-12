@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.border.BevelBorder;
 
 import model.DataCollection;
+import model.HitMissCollection;
 import model.MainDriver;
 import model.MainDriver.TrackPoint;
 import model.TimeCollection;
@@ -54,10 +55,10 @@ public class Overlay extends AbstractLabel {
     	TrackPoint.HEAVENS_WRATH, TrackPoint.GREATER_HEAL,
     	
     	TrackPoint.SHADOW_CHASER, TrackPoint.FATAL_STRIKES,
-    	TrackPoint.SHADOW_STANCE,
+    	TrackPoint.DARK_MIRE, TrackPoint.SHADOW_STANCE,
     	    	
     	TrackPoint.IRON_DEFENSE, TrackPoint.SHIELD_MASTERY,
-    	TrackPoint.DIVINE_RETRIBUTION,
+    	TrackPoint.DIVINE_RETRIBUTION, TrackPoint.DUAL_TACTICS,
     	
     	TrackPoint.SNIPE, TrackPoint.BRONZE_EAGLE, TrackPoint.EAGLES_MAJESTY,
     	TrackPoint.RANGERS_FOCUS, TrackPoint.ARCHERS_SECRETS,
@@ -68,15 +69,18 @@ public class Overlay extends AbstractLabel {
     	TrackPoint.POISON_EDGE, TrackPoint.POISON_VIAL, TrackPoint.RETALIATION, TrackPoint.MESOGUARD, TrackPoint.HASTE,
     	TrackPoint.RUSH,
     	
-    	TrackPoint.FLAME_WAVE, TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
+    	TrackPoint.FLAME_WAVE, 
+    	TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
     	TrackPoint.PERFECT_STORM, TrackPoint.FROST, TrackPoint.CHILL,
     	
     	TrackPoint.VISION_TORRENT,
     	
-    	TrackPoint.OVERCOME, TrackPoint.FIGHTING_SPIRIT, TrackPoint.PATTERN_BREAK,
+    	TrackPoint.CENTERED_MIND, TrackPoint.VENGEANCE_MAX,
+    	TrackPoint.OVERCOME, TrackPoint.CONFIDENCE,
+    	TrackPoint.FIGHTING_SPIRIT, TrackPoint.PATTERN_BREAK,
     	TrackPoint.MERIDIAN_FLOW, TrackPoint.MERIDIAN_FLOW2, TrackPoint.MERIDIAN_FLOW3,
     	
-    	TrackPoint.PINK_BEANS_PRANK,
+    	TrackPoint.PINK_BEANS_PRANK, TrackPoint.BJORNS_ARTISTRY,
     	TrackPoint.VARR_WINGS, TrackPoint.WEAPON_PROC
     };
     
@@ -250,6 +254,8 @@ public class Overlay extends AbstractLabel {
 	        for (int i = 0; i < PERSONAL.length; i++) {
 	        	if (line > 7) {
 	        		line -= 4;
+	        		if (xOffset == 100) //too many !!
+	        			continue;
 	        		xOffset = 100;
 	        	}
 		        DataCollection dc = MainDriver.data.get(PERSONAL[i]);
@@ -306,7 +312,7 @@ public class Overlay extends AbstractLabel {
 		        int x = MARGIN + GAP;
 		        int y = (int) (getSize().getHeight() * TEXT_PERCENT) * line - 20;
 	            drawImage(theGraphics, BUFFS[i].getIcon(), x, y);
-	            addTooltip(BUFFS[i], x, y);
+	            replaceTooltip(BUFFS[i], x, y);
 	        }
 	        drawText(g2d, "Debuffs", FONT_SIZE, MARGIN + (int)((GAP * 1.6)),
 	                (int) (getSize().getHeight() * TEXT_PERCENT), 1,
@@ -359,7 +365,7 @@ public class Overlay extends AbstractLabel {
 		        int x = MARGIN + (int)((GAP * 1.6));
 		        int y = (int) (getSize().getHeight() * TEXT_PERCENT) * line - 20;
 	            drawImage(theGraphics, DEBUFFS[i].getIcon(), x, y);
-	            addTooltip(DEBUFFS[i], x, y);
+	            replaceTooltip(DEBUFFS[i], x, y);
 	        }
 	        line = 5;
 	        for (int i = 0; i < MISC.length; i++) {

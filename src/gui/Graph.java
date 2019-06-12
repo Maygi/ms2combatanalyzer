@@ -105,10 +105,10 @@ public class Graph extends AbstractLabel {
     	TrackPoint.HEAVENS_WRATH, TrackPoint.GREATER_HEAL,
     	
     	TrackPoint.SHADOW_CHASER, TrackPoint.FATAL_STRIKES,
-    	//TrackPoint.SHADOW_STANCE,
+    	 TrackPoint.DARK_MIRE, TrackPoint.SHADOW_STANCE,
     	    	
     	TrackPoint.IRON_DEFENSE, TrackPoint.SHIELD_MASTERY,
-    	TrackPoint.DIVINE_RETRIBUTION,
+    	TrackPoint.DIVINE_RETRIBUTION, TrackPoint.DUAL_TACTICS,
     	
     	TrackPoint.SNIPE, TrackPoint.BRONZE_EAGLE, TrackPoint.EAGLES_MAJESTY,
     	TrackPoint.RANGERS_FOCUS, TrackPoint.ARCHERS_SECRETS,
@@ -121,22 +121,34 @@ public class Graph extends AbstractLabel {
     	
     	TrackPoint.FLAME_WAVE, TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
     	TrackPoint.PERFECT_STORM, TrackPoint.FROST, TrackPoint.CHILL,
+
+    	TrackPoint.CENTERED_MIND,
+    	TrackPoint.OVERCOME, TrackPoint.FIGHTING_SPIRIT, TrackPoint.PATTERN_BREAK,
+    	TrackPoint.MERIDIAN_FLOW, TrackPoint.MERIDIAN_FLOW2, TrackPoint.MERIDIAN_FLOW3,
+    	TrackPoint.VENGEANCE, TrackPoint.VENGEANCE_MAX, TrackPoint.FEINTING_GUARD, TrackPoint.FEINTING_GUARD_EX,
+    	TrackPoint.CONFIDENCE,
     	
-    	/*TrackPoint.OVERCOME, TrackPoint.FIGHTING_SPIRIT, TrackPoint.PATTERN_BREAK,
-    	TrackPoint.MERIDIAN_FLOW, TrackPoint.MERIDIAN_FLOW2, TrackPoint.MERIDIAN_FLOW3,*/
-    	
-    	TrackPoint.PINK_BEANS_PRANK, TrackPoint.ROOTED_STRENGTH,
+    	TrackPoint.BJORNS_ARTISTRY, TrackPoint.PINK_BEANS_PRANK, TrackPoint.LUMARIGONS_PRIDE, 
+    	TrackPoint.ROOTED_STRENGTH,
     	TrackPoint.VARR_WINGS, TrackPoint.WEAPON_PROC
     };
 
     
     private static final TrackPoint[] BUFFS = {
-    	TrackPoint.HOLY_SYMBOL, TrackPoint.BLESSINGS, TrackPoint.FOCUSSEAL, TrackPoint.SHARPEYES, TrackPoint.HONINGRUNES, TrackPoint.WARHORN
+    	TrackPoint.BLESSINGS, TrackPoint.VITALITY, TrackPoint.FOCUSSEAL, TrackPoint.SHARPEYES, TrackPoint.GREATER_SHARP_EYES,
+    	TrackPoint.HONINGRUNES, TrackPoint.WARHORN,
+    	TrackPoint.HOLY_SYMBOL
     };
 
     
     private static final TrackPoint[] DEBUFFS = {
-    	TrackPoint.SMITE, TrackPoint.SHIELDTOSS, TrackPoint.MOD, TrackPoint.STATIC_FLASH, TrackPoint.RAGING_TEMPEST
+    	TrackPoint.ARIELS_WINGS,
+    	TrackPoint.SMITE, TrackPoint.PURIFYING_LIGHT, 
+    	TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD,
+    	TrackPoint.MOD, 
+    	TrackPoint.SOUL_FLOCK, TrackPoint.STATIC_FLASH, 
+    	TrackPoint.SOUL_DISSONANCE, TrackPoint.RAGING_TEMPEST,
+    	TrackPoint.PATTERN_BREAK_DEBUFF
     };
 
     private static final GuiButton[] BUTTONS = {
@@ -297,6 +309,13 @@ public class Graph extends AbstractLabel {
 	                	g2d.setStroke(new BasicStroke(GRAPH_LINE_WIDTH * 2));
 	                	g2d.drawLine(x1, y + 12, x2, y + 12);
 	        		}
+	        	}
+	        	if (hit && j == data.size() - 1) { //draw it anyway
+    	        	double xPerc = (double)j / (double)data.size();
+                	x2 = GRAPH_ORIGIN[0] + (int)(xPerc * GRAPH_DIM[0]);
+                	g2d.setColor(GRAPH_LINE_COLOR);
+                	g2d.setStroke(new BasicStroke(GRAPH_LINE_WIDTH * 2));
+                	g2d.drawLine(x1, y + 12, x2, y + 12);	        		
 	        	}
 	        	
 	        }

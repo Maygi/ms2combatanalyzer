@@ -51,6 +51,7 @@ public class DeltaCollection extends DataCollection {
 	private double multiplier;
 	
 	private BigInteger total;
+	private static BigInteger totalDamageCounted = BigInteger.ZERO;
 	
 	/**
 	 * The type of debuff.
@@ -262,30 +263,31 @@ public class DeltaCollection extends DataCollection {
 		if (!addData)
 			return;
 		BigInteger rawDamage = secondLast.subtract(last);
+		totalDamageCounted = totalDamageCounted.add(rawDamage);
 		List<BigInteger> realData = MainDriver.data.get(TrackPoint.HP).getData();
 		
 		int index = realData.size() - 1;
 		
 		DeltaCollection smiteColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SMITE_AMP));
 		DeltaCollection modColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.MOD_AMP));
+		DeltaCollection plColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP));
 		DeltaCollection[] damageAmp = {
-			smiteColl, modColl	
+			smiteColl, modColl, plColl
 		};
 		TrackPoint[] damageAmpTp = {
-			TrackPoint.SMITE, TrackPoint.MOD
+			TrackPoint.SMITE, TrackPoint.MOD, TrackPoint.PURIFYING_LIGHT
 		};
 
 		DeltaCollection sfColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.STATIC_FLASH_AMP));
 		DeltaCollection stColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SHIELDTOSS_AMP));
 		DeltaCollection csColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.CYCLONE_SHIELD_AMP));
-		DeltaCollection plColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP));
 		DeltaCollection birdColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SOUL_FLOCK_AMP));
 		DeltaCollection arielColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.ARIELS_WINGS_AMP));
 		DeltaCollection[] defDebuff = {
-			sfColl, stColl, csColl, plColl, birdColl, arielColl
+			sfColl, stColl, csColl, birdColl, arielColl
 		};
 		TrackPoint[] defDebuffTp = {
-			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD, TrackPoint.PURIFYING_LIGHT, TrackPoint.SOUL_FLOCK,
+			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD, TrackPoint.SOUL_FLOCK,
 			TrackPoint.ARIELS_WINGS
 		};
 
@@ -293,7 +295,9 @@ public class DeltaCollection extends DataCollection {
 		//calculate pre-damage amp value
 		double totalAmp = 1;
 		for (int i = 0; i < damageAmp.length; i++) {
-			boolean hit = ((HitMissCollection)(MainDriver.data.get(damageAmpTp[i]))).getRawData().get(index);
+			List<Boolean> list = ((HitMissCollection)(MainDriver.data.get(damageAmpTp[i]))).getRawData();
+			index = list.size() - 1;
+			boolean hit = list.get(index);
 			totalAmp += hit ? damageAmp[i].getMultiplier() : 0;
 		}
 		BigDecimal preAmp = new BigDecimal(rawDamage.doubleValue()).divide(new BigDecimal(totalAmp), 2, RoundingMode.HALF_UP);
@@ -301,13 +305,15 @@ public class DeltaCollection extends DataCollection {
 		//use pre-damage amp value to calculate pre-defense debuff value
 		double defFactor = 0;
 		for (int i = 0; i < defDebuff.length; i++) {
-			boolean hit = ((HitMissCollection)(MainDriver.data.get(defDebuffTp[i]))).getRawData().get(index);
+			List<Boolean> list = ((HitMissCollection)(MainDriver.data.get(defDebuffTp[i]))).getRawData();
+			index = list.size() - 1;
+			boolean hit = list.get(index);
 			defFactor += hit ? defDebuff[i].getMultiplier() : 0;
 		}
 		double totalDefAmp = 1 / (1 - defFactor);
 		BigDecimal preDefAmp = preAmp.divide(new BigDecimal(totalDefAmp), 2, RoundingMode.HALF_UP);
-
-		System.out.println("Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
+		
+		System.out.println("Total: "+totalDamageCounted.toString()+"; Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
 		BigDecimal totalDebuff = BigDecimal.ZERO;
 		for (int i = 0; i < defDebuffTp.length; i++) {
 			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%)
@@ -353,7 +359,8 @@ public class DeltaCollection extends DataCollection {
 			}*/
 			updateDelta(addData, toAdd);
 			updateSoftDelta(addData);
-			addData(total);
+			if (type == OTHER)
+				addData(total);
 			if (MainDriver.getEllaspedTime() > 0)
 				dataOverTime.add(total.divide(new BigInteger(Integer.toString(MainDriver.getEllaspedTime()))));
 		}

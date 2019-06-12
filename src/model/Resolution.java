@@ -69,7 +69,7 @@ public class Resolution {
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 410), (int) (screenSize.getHeight() - 300),
 				(int) (screenSize.getWidth() / 2 - 60), (int) (screenSize.getHeight() - 195)});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 60), (int) (screenSize.getHeight() - 300),
-				(int) (screenSize.getWidth() / 2 + 360), (int) (screenSize.getHeight() - 195)});
+				(int) (screenSize.getWidth() / 2 + 340), (int) (screenSize.getHeight() - 195)});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 140), 76,
 				(int) (screenSize.getWidth() / 2 + 140 + 198), 76 + 29});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 315), 77,
