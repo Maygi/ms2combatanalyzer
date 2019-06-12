@@ -33,7 +33,7 @@ import util.VersionCheck;
  */
 public class MainDriver {
 	
-	public static final String VERSION = "1.33";
+	public static final String VERSION = "1.3.4";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -119,7 +119,7 @@ public class MainDriver {
 		
 		//sb awakening
 		SOUL_DISSONANCE("Soul Dissonance", "Decreases evasion and critical evasion of target", "souldissonance.png", Resolution.BOSS_DEBUFFS, 0.998),
-		SOUL_FLOCK("Soul Flock - 5 stacks", "Decreases defense of target", "soulflock5-1.png", "soulflock5-2.png", Resolution.BOSS_DEBUFFS, 0.7),
+		SOUL_FLOCK("Soul Flock - 5 stacks", "Decreases defense of target", "soulflock5-1.png", "soulflock5-2.png", "soulflock.png", Resolution.BOSS_DEBUFFS, 0.7),
 		VISION_TORRENT("Vision Torrent", "Increases magic attack and enhances skills", "visiontorrent.png", Resolution.BUFFS, 0.999, ClassConstants.SOUL_BINDER),
 		
 		//priest awakening
@@ -196,7 +196,7 @@ public class MainDriver {
 		SHIELD2("2x Shield Uptime", "Reduces damage taken by 80%", "doubleshield.png", Resolution.BOSS_BUFFS),
 		DMG_MITIGATED("Damage Mitigated: ", "0");
 		
-		private String name, intro, image, secondaryImage = null;
+		private String name, intro, image, secondaryImage = null, req = null;
 		private double threshold;
 		private int regionIndex;
 		private int classIndex = -1;
@@ -258,7 +258,16 @@ public class MainDriver {
 			this.name = name;
 			this.intro = intro;
 			this.image = image;
-			this.secondaryImage = image;
+			this.secondaryImage = secondaryImage;
+			this.threshold = threshold;
+		}
+		private TrackPoint(String name, String intro, String image, String secondaryImage, String req, int regionIndex, double threshold) {
+			this.regionIndex = regionIndex;
+			this.name = name;
+			this.intro = intro;
+			this.image = image;
+			this.secondaryImage = secondaryImage;
+			this.req = req;
 			this.threshold = threshold;
 		}
 		private TrackPoint(String name, String intro, String image, int resolutionIndex, double threshold) {
@@ -310,6 +319,14 @@ public class MainDriver {
 			StringBuilder sb = new StringBuilder();
 			sb.append("images/sikuli/");
 			sb.append(secondaryImage);
+			return sb.toString();
+		}
+		public String getReq() {
+			if (req == null)
+				return null;
+			StringBuilder sb = new StringBuilder();
+			sb.append("images/sikuli/");
+			sb.append(req);
 			return sb.toString();
 		}
 		
@@ -833,6 +850,12 @@ public class MainDriver {
 	    			System.out.println(tp.getName()+": "+m.getScore());
 	    		}
 				hit = m != null && m.getScore() >= tp.getThreshold();
+				if (tp.getReq() != null) {
+	    	        Region r = regionMap.get(tp.getRegionIndex());
+					m = r.exists(tp.getReq(), 0.01);
+					if (m.getScore() < tp.getThreshold())
+						hit = false;
+				}
 				if (tp.getName().contains("Dungeon Complete") && hit) {
 					pause();
 					break;

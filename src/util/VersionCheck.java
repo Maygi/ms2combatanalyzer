@@ -6,6 +6,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Scanner;
 
+import model.MainDriver;
+
 public class VersionCheck {
 	
 	private static final String URL = "https://api.github.com/repos/Maygi/ms2combatanalyzer/tags";
@@ -34,6 +36,24 @@ public class VersionCheck {
 			ex.printStackTrace();
 		}
 		return json;
+	}
+	
+	public static boolean needsUpdate() {
+		String current = MainDriver.VERSION;
+		String live = MainDriver.liveVersion;
+		String[] currentParts = current.split(".");
+		String[] liveParts = live.split(".");
+		for (int i = 0; i < currentParts.length; i++) {
+			int realCurrent = Integer.parseInt(currentParts[i]);
+			if (i >= liveParts.length) { //maybe we have current 1.3.1 vs live 1.3?
+				return false;
+			} else {
+				int realLive = Integer.parseInt(liveParts[i]);
+				if (realCurrent < realLive)
+					return true;
+			}
+		}
+		return false;
 	}
 	
 	/**

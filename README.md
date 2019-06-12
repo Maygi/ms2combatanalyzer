@@ -10,14 +10,12 @@ Check the [releases](https://github.com/Maygi/ms2combatanalyzer/releases) page t
 # How to use
 Currently, MSCA requires that you play in fullscreen mode. Due to how it collects data, note that obstructing your UI at any time may lead to inaccurate results. It was made for 1920x1080 resolution but should (keyword: should) work in different resolutions as long as you're in **fullscreen**. Additionally, you must go to your game settings and make sure **Interface Size is at 50%**. Lastly, this overlay only parses encounters with **boss enemies**.
 
-**IMPORTANT!!**
-Nexon does not support third-party applications. That being said, I have received the following response from them:
+# Is it legal?
+Yes! The combat analyzer is safe to use, as confirmed in the post regarding [XML editing related bans](http://forums.maplestory2.nexon.net/discussion/45522/bans-xml-editing-ban-wave).
 
-> We truly appreciate your efforts toward the game. We would like to inform you that as long as you didn't violate any of the TOS, you will not receive any sanctions. I assure you that the game team are reviewing your inquiry.
+> "non-malicious tools like combat analyzer that’s been going around are still OK to use"
 
-I have gone over the [Terms of Use](https://www.nexon.com/main/en/legal/tou) and [End User License Agreement](http://www.nexon.net/legal/end-user-license-agreement/) many times and concluded that this overlay should be compliant. While third-party applications are never supported by Nexon, I do not believe anybody will get banned for using this, but keep in mind that **use of this program is at your own risk** >_>
-
-To run MSCA, just follow these easy steps:
+To run MSCA, just follow these steps:
 
 1. Go to the [releases](https://github.com/Maygi/ms2combatanalyzer/releases) and download the latest version at the bottom. It will be a .zip or .gz file.
 2. Extract the MSCA zip folder.

@@ -352,7 +352,7 @@ public class DeltaCollection extends DataCollection {
 		if (flag || type == OTHER) {
 			BigDecimal decimal = addData ? new BigDecimal((secondLast.subtract(last).toString())) : BigDecimal.ZERO;
 			BigInteger toAdd = addData ? new BigInteger(Integer.toString(decimal.multiply(new BigDecimal(multiplier)).intValue())) : BigInteger.ZERO;
-			if (addData) {
+			if (type == OTHER && addData) {
 				total = total.add(toAdd);
 			}/* else {
 				deltas.add(deltas.size() == 0 ? 0 : deltas.get(deltas.size() - 1));
@@ -386,5 +386,6 @@ public class DeltaCollection extends DataCollection {
 		dataOverTime = new ArrayList<BigInteger>();
 		deltas = new ArrayList<BigInteger>();
 		softDeltas = new ArrayList<BigInteger>();
+		breaks = 0;
 	}
 }

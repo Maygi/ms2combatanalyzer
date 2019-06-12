@@ -17,6 +17,7 @@ import model.MainDriver;
 import model.MainDriver.TrackPoint;
 import model.TimeCollection;
 import particles.Particle;
+import util.VersionCheck;
 
 /**
  * This is the main GUI for the data chart.
@@ -208,9 +209,6 @@ public class Overlay extends AbstractLabel {
         if (!MainDriver.active) {
             drawFilm(theGraphics, Color.GRAY);
         }
-    	BigDecimal currentVersion = new BigDecimal(MainDriver.VERSION);
-    	BigDecimal liveVersion = new BigDecimal(MainDriver.liveVersion);
-    	boolean newVersion = (currentVersion.compareTo(liveVersion) < 0);
         if (MainDriver.started) {
 	        drawText(g2d, "Party Stats", FONT_SIZE, MARGIN,
 	                (int) (getSize().getHeight() * TEXT_PERCENT), 1,
@@ -386,7 +384,7 @@ public class Overlay extends AbstractLabel {
 	        }
         } else {
         	try {
-	        	if (newVersion) {
+	        	if (VersionCheck.needsUpdate()) {
 			        drawText(g2d, "New build available!", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
 			                (int) (getSize().getHeight() * 0.3), 1,
 			                Color.WHITE, SHADOW_COLOR.darker());
@@ -456,7 +454,7 @@ public class Overlay extends AbstractLabel {
         }
         for (final GuiButton b : BUTTONS) {
         	if (b.getImage().contains("update")) {
-        		if (MainDriver.started || !newVersion)
+        		if (MainDriver.started || !VersionCheck.needsUpdate())
         			continue;
         	}
         	b.handleDraw(this, theGraphics);
