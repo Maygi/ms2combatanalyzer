@@ -1,6 +1,10 @@
 package model;
 
 public class ClassConstants {
+	public static final String[] CLASS_IMAGES = {
+		"archer", "sin", "zerker", "hg", "knight", "priest", "rb", "sb", "striker", null, "wizard"	
+	};
+	
 	public static final int ARCHER = 0;
 	public static final int ASSASSIN = 1;
 	public static final int BERSERKER = 2;

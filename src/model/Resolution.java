@@ -24,6 +24,7 @@ public class Resolution {
 	public static final int SPIRIT = 6;
 	public static final int TOMBSTONE = 7;
 	public static final int DUNGEON_CLEAR = 8;
+	public static final int CLASS_ICON = 9;
 	
 	private Dimension screenSize;
 	
@@ -92,6 +93,8 @@ public class Resolution {
 									(int) (screenSize.getWidth() / 2 + 40), (int) (screenSize.getHeight() / 2)});*/
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 300), (int) (screenSize.getHeight() / 8), 
 									(int) (screenSize.getWidth() / 2 + 300), (int) (screenSize.getHeight() / 2)});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 20), (int) (screenSize.getHeight() - 175), 
+				(int) (screenSize.getWidth() / 2 + 20), (int) (screenSize.getHeight() - 120)});
 		
 		
 		sizes = new ArrayList<Integer[]>();

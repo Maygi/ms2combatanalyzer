@@ -384,7 +384,18 @@ public class Overlay extends AbstractLabel {
 	        }
         } else {
         	try {
-	        	if (VersionCheck.needsUpdate()) {
+	        	if (MainDriver.liveVersion.equals("???")) {
+			        drawText(g2d, "Unable to check versions.", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
+			                (int) (getSize().getHeight() * 0.3), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+			        drawNormalTextCentered(g2d, "Enter combat with a boss to begin!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+			                (int) (getSize().getHeight() * 0.55), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+			        drawNormalTextCentered(g2d, "(make sure UI size is set to 50%)", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+			                (int) (getSize().getHeight() * 0.7), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());
+	        		
+	        	} else if (VersionCheck.needsUpdate()) {
 			        drawText(g2d, "New build available!", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
 			                (int) (getSize().getHeight() * 0.3), 1,
 			                Color.WHITE, SHADOW_COLOR.darker());

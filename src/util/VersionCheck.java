@@ -29,6 +29,7 @@ public class VersionCheck {
 			connection.setRequestMethod("GET");
 			connection.setRequestProperty("Content-Type", "application/json");
 			connection.setRequestProperty("charset", "utf-8");
+			connection.setConnectTimeout(10000);
 			connection.connect();
 			InputStream inStream = connection.getInputStream();
 			json = streamToString(inStream); // input stream to string
@@ -41,6 +42,8 @@ public class VersionCheck {
 	public static boolean needsUpdate() {
 		String current = MainDriver.VERSION;
 		String live = MainDriver.liveVersion;
+		if (live.equals("???"))
+			return false;
 		return !latestVersion(current, live);
 	}
 	
@@ -71,6 +74,8 @@ public class VersionCheck {
 	 */
 	public static String getVersion() {
 		String raw = getJSon(URL);
+		if (raw == null)
+			return "???";
 		String latest = "1.0";
 		while (raw.contains("\"name\":\"")) {
 			int index = raw.indexOf("\"name\":\"");

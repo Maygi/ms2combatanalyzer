@@ -28,12 +28,11 @@ import util.VersionCheck;
 
 /**
  * The main driver of the class that uses Sikuli to add data to various collections.
- * Version 1.3.3
  * @author May
  */
 public class MainDriver {
 	
-	public static final String VERSION = "2.0";
+	public static final String VERSION = "2.1";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -791,9 +790,24 @@ public class MainDriver {
     }
     
     public static void tick() {
-    	BigInteger one = new BigInteger("1531081794");
-    	BigInteger two = new BigInteger("523314638");
-    	//System.out.println("WILL IT BLEND?" +isClose(one, two));
+    	if (activeClass < 0) {
+    		Integer[] region = resolution.getRegion(Resolution.CLASS_ICON);
+	        Region r = new Region(region[0], region[1], region[2] - region[0], region[3] - region[1]);
+	        for (int i = 0; i < ClassConstants.CLASS_IMAGES.length; i++) {
+	        	if (ClassConstants.CLASS_IMAGES[i] != null) {
+	    			StringBuilder sb = new StringBuilder();
+	    			sb.append("images/sikuli/");
+	    			sb.append("class_");
+	    			sb.append(ClassConstants.CLASS_IMAGES[i]);
+	    			sb.append(".png");
+					Match m = r.exists(sb.toString() , 0.01);
+					if (m != null && m.getScore() >= 0.9) {
+						activeClass = i;
+						break;
+					}
+	        	}
+	        }
+    	}
         //double timeMultiplier = ((TimeCollection)MainDriver.data.get(TrackPoint.TIME)).getTimeMultiplier();
         //System.out.println("Multiplier: "+timeMultiplier);
         Screen s = new Screen();
@@ -832,6 +846,8 @@ public class MainDriver {
     			continue;
     		}
     		if (image != null && (dc instanceof HitMissCollection || dc instanceof CountCollection)) {
+    			if (!active)
+    				continue;
 	    		boolean hit;
 	    		if (tp.usesScreen()) {
 					if (tp.getName().contains("Dungeon Complete") && !checkForClear()) {
@@ -853,7 +869,7 @@ public class MainDriver {
 				if (tp.getReq() != null) {
 	    	        Region r = regionMap.get(tp.getRegionIndex());
 					m = r.exists(tp.getReq(), 0.01);
-					if (m.getScore() < tp.getThreshold())
+					if (m.getScore() < 0.999)
 						hit = false;
 				}
 				if (tp.getName().contains("Dungeon Complete") && hit) {
