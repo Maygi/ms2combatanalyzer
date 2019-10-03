@@ -67,14 +67,16 @@ public class Resolution {
 				(int) (screenSize.getWidth() / 2 + 390), 220});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 400), 0,
 				(int) (screenSize.getWidth() / 2), 55});
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 410), (int) (screenSize.getHeight() - 300),
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 410), (int) (screenSize.getHeight() - 350),
 				(int) (screenSize.getWidth() / 2 - 60), (int) (screenSize.getHeight() - 195)});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 60), (int) (screenSize.getHeight() - 300),
 				(int) (screenSize.getWidth() / 2 + 340), (int) (screenSize.getHeight() - 195)});
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 140), 76,
-				(int) (screenSize.getWidth() / 2 + 140 + 198), 76 + 29});
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 315), 77,
-				(int) (screenSize.getWidth() / 2 - 275), 102});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 70), 76,
+				(int) (screenSize.getWidth() / 2 + 140 + 198 + 70), 76 + 29});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 366), 80,
+				(int) (screenSize.getWidth() / 2 - 366 + 50), 140});
+		/*baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 315), 77,
+				(int) (screenSize.getWidth() / 2 - 275), 102});*/
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 10), (int) (screenSize.getHeight() - 255),
 				(int) (screenSize.getWidth() / 2 + 50), (int) (screenSize.getHeight() - 185)});
 		

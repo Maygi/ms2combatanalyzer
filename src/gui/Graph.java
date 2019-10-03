@@ -148,7 +148,7 @@ public class Graph extends AbstractLabel {
     	TrackPoint.MOD, 
     	TrackPoint.SOUL_FLOCK, TrackPoint.STATIC_FLASH, 
     	TrackPoint.SOUL_DISSONANCE, TrackPoint.RAGING_TEMPEST,
-    	TrackPoint.PATTERN_BREAK_DEBUFF
+    	TrackPoint.PATTERN_BREAK_DEBUFF, TrackPoint.MADRIA
     };
 
     private static final GuiButton[] BUTTONS = {

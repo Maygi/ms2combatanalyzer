@@ -102,6 +102,7 @@ public class Overlay extends AbstractLabel {
     	TrackPoint.MOD, 
     	TrackPoint.SOUL_FLOCK, TrackPoint.STATIC_FLASH, 
     	TrackPoint.SOUL_DISSONANCE, TrackPoint.RAGING_TEMPEST,
+    	TrackPoint.MADRIA
     };
     
     private static final TrackPoint[] MISC = {
@@ -354,6 +355,10 @@ public class Overlay extends AbstractLabel {
 				if (DEBUFFS[i].getName().contains("Ariel's Wings")) {
 					sb.append(" | ");
 					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.ARIELS_WINGS_AMP).getLast())));
+				}
+				if (DEBUFFS[i].getName().contains("Madria")) {
+					sb.append(" | ");
+					sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.MADRIA_AMP).getLast())));
 				}
 				text = sb.toString();
 				line++;

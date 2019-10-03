@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -32,7 +33,7 @@ import util.VersionCheck;
  */
 public class MainDriver {
 	
-	public static final String VERSION = "2.1";
+	public static final String VERSION = "2.2";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -67,6 +68,7 @@ public class MainDriver {
 		MOD("Mark of Death", "Increases damage taken by target", "markofdeath.png", Resolution.BOSS_DEBUFFS, 0.9995),
 		STATIC_FLASH("Static Flash", "Decreases defense of target", "staticflash.png", Resolution.BOSS_DEBUFFS, 0.9995),
 		RAGING_TEMPEST("Raging Tempest", "Decreases target's evasion and accuracy", "ragingtempest.png", Resolution.BOSS_DEBUFFS, 0.999),
+		MADRIA("Madria's Whim Debuff", "Increases damage taken by target", "madria.png", Resolution.BOSS_DEBUFFS, 0.9995),
 
 		//buffs
 		BLESSINGS("Celestial Blessings", "Increases physical/magic attack and resistance", "blessings.png", Resolution.BUFFS, 0.9),
@@ -184,6 +186,7 @@ public class MainDriver {
 		SOUL_FLOCK_AMP("Damage Amplified: ", "0"),
 		ARIELS_WINGS_AMP("Damage Amplified: ", "0"),
 		MOD_AMP("Damage Amplified: ", "0"),
+		MADRIA_AMP("Damage Amplified: ", "0"),
 		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png", Resolution.DUNGEON_CLEAR),
 		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "dead.png", Resolution.TOMBSTONE, 0.99),
 		//TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
@@ -502,6 +505,7 @@ public class MainDriver {
         data.put(TrackPoint.SHIELD2, new HitMissCollection());
         data.put(TrackPoint.SHIELD, new HitMissCollection());
         data.put(TrackPoint.BOSS_HEAL, new CountCollection(2));
+        data.put(TrackPoint.MADRIA_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.05, DeltaCollection.DAMAGE_AMP)); //assumes max level
         data.put(TrackPoint.MOD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.DAMAGE_AMP)); //assumes max level
         data.put(TrackPoint.SHIELDTOSS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.STATIC_FLASH_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
@@ -511,6 +515,7 @@ public class MainDriver {
         data.put(TrackPoint.POISON_VIAL, new HitMissCollection());
         data.put(TrackPoint.RAGING_TEMPEST, new HitMissCollection());
         data.put(TrackPoint.MOD, new HitMissCollection(TrackPoint.MOD_AMP));
+        data.put(TrackPoint.MADRIA, new HitMissCollection(TrackPoint.MADRIA_AMP));
         data.put(TrackPoint.SHIELDTOSS, new HitMissCollection(TrackPoint.SHIELDTOSS_AMP));
         data.put(TrackPoint.FLAME_WAVE, new HitMissCollection());
         data.put(TrackPoint.IRON_DEFENSE, new HitMissCollection());
@@ -869,7 +874,7 @@ public class MainDriver {
 				if (tp.getReq() != null) {
 	    	        Region r = regionMap.get(tp.getRegionIndex());
 					m = r.exists(tp.getReq(), 0.01);
-					if (m.getScore() < 0.999)
+					if (m == null || m.getScore() < 0.999)
 						hit = false;
 				}
 				if (tp.getName().contains("Dungeon Complete") && hit) {
@@ -930,9 +935,15 @@ public class MainDriver {
     	        //String text = ocr.read(new Rectangle(region[0], region[1], region[2], region[3]));
     	        BigInteger value = null;
     	        if (tp.getName().contains("HP")) {
+	    			//System.out.println("Text length: "+text.length);
 	    	        for (String string : text) {
 	    	        	try {
+	    	    			//System.out.println("LOOKING IN: "+Arrays.toString(region));
+	    	        		if (string.length() == 0)
+	    	        			continue;
+	    	    			//System.out.println(tp.getName() +": "+string);
 	    	        		value = new BigInteger(string);
+	    	    			//System.out.println(tp.getName() +" (SUCCESS): "+string);
 	    	        		if (!isClose(value, lastHPReading)) { //bad reading
 	    	        	        if (dc.getData().size() < 5) {
 	        	        			logOutput.println("BAD READING! Data is <5.");

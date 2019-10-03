@@ -12,6 +12,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SpringLayout;
@@ -34,6 +36,9 @@ public class OverlayFrame extends AbstractFrame {
 	private int x;
     private int y;
     
+    private static final int WIDTH = 500;
+    private static final int HEIGHT = 260;
+    
     private boolean hover = false;
 
     public OverlayFrame() {
@@ -47,7 +52,7 @@ public class OverlayFrame extends AbstractFrame {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(500, 260);
+        return new Dimension(WIDTH, HEIGHT);
     }
     
     /**
@@ -92,23 +97,29 @@ public class OverlayFrame extends AbstractFrame {
     	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
     	x = (int) (screenSize.getWidth() / 2);
     	y = (int) (screenSize.getHeight() / 2);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setAutoRequestFocus(false);
         setFocusableWindowState(false);
-        setUndecorated(true);
-        setBackground(new Color(0, 0, 0, 0));
+        //setUndecorated(true);
+        //setBackground(new Color(0, 0, 0, 0));
         setAlwaysOnTop(true);
+        
         
         getRootPane().putClientProperty("apple.awt.draggableWindowBackground", false);
         setLocationRelativeTo(null);
         setVisible(true);
         addKeyListener(new KeyboardListener());
     	loadProps();
-        
+        JFrame that = this;
         addMouseListener(new MouseAdapter(){
            public void mousePressed(MouseEvent ev) {
-	            x = ev.getX();
-	            y = ev.getY();
+	            int x = ev.getX();
+	            int y = ev.getY();
+            	int offX = (that.getWidth() - WIDTH) / 2;
+            	int offY = (that.getHeight() - HEIGHT) / 2;
+            	x -= offX;
+            	y -= offY;
+            	y -= 15; //for undecorated 
 	            for (final GuiButton b : GuiButton.class.getEnumConstants()) {
 	            	int[] coords = b.getCoords();
 	                if (x >= coords[0] && x <= coords[0] +  b.getWidth()  &&

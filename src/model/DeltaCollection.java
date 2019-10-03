@@ -271,11 +271,12 @@ public class DeltaCollection extends DataCollection {
 		DeltaCollection smiteColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SMITE_AMP));
 		DeltaCollection modColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.MOD_AMP));
 		DeltaCollection plColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP));
+		DeltaCollection madColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.MADRIA_AMP));
 		DeltaCollection[] damageAmp = {
-			smiteColl, modColl, plColl
+			smiteColl, modColl, plColl, madColl
 		};
 		TrackPoint[] damageAmpTp = {
-			TrackPoint.SMITE, TrackPoint.MOD, TrackPoint.PURIFYING_LIGHT
+			TrackPoint.SMITE, TrackPoint.MOD, TrackPoint.PURIFYING_LIGHT, TrackPoint.MADRIA
 		};
 
 		DeltaCollection sfColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.STATIC_FLASH_AMP));
@@ -313,7 +314,7 @@ public class DeltaCollection extends DataCollection {
 		double totalDefAmp = 1 / (1 - defFactor);
 		BigDecimal preDefAmp = preAmp.divide(new BigDecimal(totalDefAmp), 2, RoundingMode.HALF_UP);
 		
-		System.out.println("Total: "+totalDamageCounted.toString()+"; Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
+		MainDriver.logOutput.println("Total: "+totalDamageCounted.toString()+"; Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
 		BigDecimal totalDebuff = BigDecimal.ZERO;
 		for (int i = 0; i < defDebuffTp.length; i++) {
 			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%)
@@ -322,7 +323,7 @@ public class DeltaCollection extends DataCollection {
 				continue;			
 			double totalDefPortion = defFactor == 0 ? 0 : defDebuff[i].getMultiplier() / defFactor;
 			BigDecimal contribution = preAmp.subtract(preDefAmp).multiply(new BigDecimal(totalDefPortion));
-			System.out.println(defDebuffTp[i].getName()+" - Total def debuff: "+defFactor+": portion: "+totalDefPortion+"; contribution: "+contribution.toString());
+			MainDriver.logOutput.println(defDebuffTp[i].getName()+" - Total def debuff: "+defFactor+": portion: "+totalDefPortion+"; contribution: "+contribution.toString());
 			defDebuff[i].addDataFinal(contribution);
 			totalDebuff = totalDebuff.add(contribution);
 		}
@@ -332,12 +333,12 @@ public class DeltaCollection extends DataCollection {
 			if (!hit)
 				continue;			
 			BigDecimal contribution = preDefAmp.multiply(new BigDecimal(damageAmp[i].getMultiplier()));
-			System.out.println(damageAmpTp[i].getName()+" - contribution: "+contribution.toString());
+			MainDriver.logOutput.println(damageAmpTp[i].getName()+" - contribution: "+contribution.toString());
 			damageAmp[i].addDataFinal(contribution);
 			totalDebuff = totalDebuff.add(contribution);
 		}
 		BigInteger synergy = rawDamage.subtract(preDefAmp.toBigInteger()).subtract(totalDebuff.toBigInteger());
-		System.out.println("SYNERGY: "+synergy.toString());
+		MainDriver.logOutput.println("SYNERGY: "+synergy.toString());
 	}
 	
 	public void addDataFinal(BigDecimal value) {
