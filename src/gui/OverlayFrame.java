@@ -100,8 +100,11 @@ public class OverlayFrame extends AbstractFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setAutoRequestFocus(false);
         setFocusableWindowState(false);
-        //setUndecorated(true);
-        //setBackground(new Color(0, 0, 0, 0));
+        
+        //disable these for stream-friendliness - also toggle comment on y offset
+        setUndecorated(true);
+        setBackground(new Color(0, 0, 0, 0));
+        
         setAlwaysOnTop(true);
         
         
@@ -119,7 +122,7 @@ public class OverlayFrame extends AbstractFrame {
             	int offY = (that.getHeight() - HEIGHT) / 2;
             	x -= offX;
             	y -= offY;
-            	y -= 15; //for undecorated 
+            	//y -= 15; //for undecorated 
 	            for (final GuiButton b : GuiButton.class.getEnumConstants()) {
 	            	int[] coords = b.getCoords();
 	                if (x >= coords[0] && x <= coords[0] +  b.getWidth()  &&

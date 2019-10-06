@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sikuli.script.Match;
+import org.sikuli.script.Region;
+
 /**
  * A class for handling methods related to finding screen regions given different resolutions.
  * @author May
@@ -30,10 +33,15 @@ public class Resolution {
 	
 	private List<Integer[]> regions;
 	private boolean match = false;
+	private boolean initialized = false;
 	
 	public Resolution(Dimension screenSize) {
 		this.screenSize = screenSize;
 		initialize();
+	}
+	
+	public boolean initialized() {
+		return initialized;
 	}
 	
 	/**
@@ -59,22 +67,50 @@ public class Resolution {
 	
 	private List<Integer[]> baseRegion, sizes;
 	
-	private void initialize() {
+	private int getBossOffset() {
+		if (koreanClient)
+			return 17;
+		return 0;
+	}
+	
+	private boolean koreanClient = false;
+	
+	public void initialize() {
 		//configure 1920x1080 sizes. region sizes should be similar
+        Region clock = new Region(0, 0, 30, 30);
+		Match m = clock.exists("images/sikuli/clock.png", 0.01);
+		if (m != null && m.getScore() >= 0.9) {
+			System.out.println("Game client is in focus.");
+		} else {
+			System.out.println("Game client not in focus. Not initializing.");
+			return;
+		}
 		
+		initialized = true;
+
+        Region r = new Region(0, 0, 600, 30);
+		m = r.exists("images/sikuli/pc_icon.png", 0.01);
+		if (m != null && m.getScore() >= 0.95) {
+			koreanClient = true;
+			System.out.println("Korean client detected.");
+		} else {
+			System.out.println("Not Korean.");
+		}
+		
+		//x, y, x2, y2
 		baseRegion = new ArrayList<Integer[]>();
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 390), 125,
-				(int) (screenSize.getWidth() / 2 + 390), 220});
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 400), 0,
-				(int) (screenSize.getWidth() / 2), 55});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 390) + getBossOffset(), 125,
+				(int) (screenSize.getWidth() / 2 + 390) + getBossOffset(), 220});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 400) + getBossOffset(), 0,
+				(int) (screenSize.getWidth() / 2) + getBossOffset(), 55});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 410), (int) (screenSize.getHeight() - 350),
 				(int) (screenSize.getWidth() / 2 - 60), (int) (screenSize.getHeight() - 195)});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 60), (int) (screenSize.getHeight() - 300),
 				(int) (screenSize.getWidth() / 2 + 340), (int) (screenSize.getHeight() - 195)});
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 70), 76,
-				(int) (screenSize.getWidth() / 2 + 140 + 198 + 70), 76 + 29});
-		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 366), 80,
-				(int) (screenSize.getWidth() / 2 - 366 + 50), 140});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 70) + getBossOffset(), 76,
+				(int) (screenSize.getWidth() / 2 + 140 + 198 + 70) + getBossOffset(), 76 + 29});
+		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 366) + getBossOffset(), 80,
+				(int) (screenSize.getWidth() / 2 - 366 + 50) + getBossOffset(), 140});
 		/*baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 315), 77,
 				(int) (screenSize.getWidth() / 2 - 275), 102});*/
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 10), (int) (screenSize.getHeight() - 255),

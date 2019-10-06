@@ -795,6 +795,10 @@ public class MainDriver {
     }
     
     public static void tick() {
+    	if (!resolution.initialized()) {
+    		resolution.initialize();
+    		return;
+    	}
     	if (activeClass < 0) {
     		Integer[] region = resolution.getRegion(Resolution.CLASS_ICON);
 	        Region r = new Region(region[0], region[1], region[2] - region[0], region[3] - region[1]);
