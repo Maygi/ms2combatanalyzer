@@ -172,7 +172,7 @@ public class MainDriver {
 		//misc
 		SPIRIT("SP Efficiency: ", "% of the time SP was under 100%", "spirit.png", Resolution.SPIRIT, 0.94),
 		HP("HP", "", Resolution.BOSS_HEALTH),
-		BOSS("HP", "", "boss.png", Resolution.BOSS_TAG),
+		BOSS("HP", "", "boss.png", "boss2.png", Resolution.BOSS_TAG),
 		RAID_DPS("Raid DPS", "Average raid damage per second"),
 		TIME("Time", "Total ellasped time of the encounter and estimated clear time", "clock.png"),
 		HOLY_SYMBOL_DAMAGE("Holy Symbol Damage", "Estimated contribution of Holy Symbol", "holysymbol.png"),
@@ -986,6 +986,9 @@ public class MainDriver {
     	        	int[] regionBoss = TrackPoint.BOSS.getRegion();
         	        Region r2 = new Region(regionBoss[0], regionBoss[1], regionBoss[2] - regionBoss[0], regionBoss[3] - regionBoss[1]);
 	    			m = r2.exists(TrackPoint.BOSS.getImage(), 0.01);
+	    			if (m == null) {
+		    			m = r2.exists(TrackPoint.BOSS.getSecondaryImage(), 0.01);
+	    			}
 	    			if (m == null) {
 	    				System.out.println("Found HP: "+value+", but unable to find [Boss] tag.");
 	    			} else {
