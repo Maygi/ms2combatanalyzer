@@ -33,7 +33,7 @@ import util.VersionCheck;
  */
 public class MainDriver {
 	
-	public static final String VERSION = "2.3";
+	public static final String VERSION = "3.1";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -191,6 +191,8 @@ public class MainDriver {
 		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "dead.png", Resolution.TOMBSTONE, 0.99),
 		//TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
 		INFERNOG_BOMB("Infernog Blue Bomb", "Drops a puddle when the timer ends", "infernogbomb.png", Resolution.DEBUFFS, 0.99),
+		INFERNOG_BOMB2("Infernog Bomb", "Drops a puddle when the timer ends", "infernogbomb2.png", Resolution.DEBUFFS, 0.98),
+		AGGRO_DROP("Aggro Drop", "Aggro is about to drop off", "aggro.png", Resolution.DEBUFFS, 0.96),
 		PB_DANCE("Pink Bean - Dance", "Explode with music periodically", "pbdance.png", Resolution.DEBUFFS, 0.99),
 		PB_REFLECT("Pink Bean - Reflect", "Take 99% less damage and reflect damage", "pbreflect.png", Resolution.DEBUFFS, 0.99),
 		BOSS_HEAL("Boss Healing", "Number of times the boss healed", "bossheal.png", Resolution.BOSS_BUFFS, 0.95),
@@ -542,6 +544,8 @@ public class MainDriver {
         data.put(TrackPoint.TOMBSTONE, new HitMissCollection());
         data.put(TrackPoint.VARR_WINGS, new HitMissCollection(Sound.PROC, 10));
         data.put(TrackPoint.INFERNOG_BOMB, new HitMissCollection(Sound.STATUS_WARNING, 11));
+        data.put(TrackPoint.INFERNOG_BOMB2, new HitMissCollection(Sound.STATUS_WARNING, 11));
+        data.put(TrackPoint.AGGRO_DROP, new HitMissCollection(Sound.STATUS_WARNING2, 15));
         data.put(TrackPoint.PB_DANCE, new HitMissCollection(Sound.STATUS_WARNING, 11));
         data.put(TrackPoint.PB_REFLECT, new HitMissCollection(Sound.STATUS_WARNING2, 11));
         data.put(TrackPoint.HOLY_SYMBOL_DAMAGE, new DPSCollection((HitMissCollection)data.get(TrackPoint.HOLY_SYMBOL), 
@@ -574,7 +578,7 @@ public class MainDriver {
         data.put(TrackPoint.ARIELS_WINGS, new HitMissCollection(TrackPoint.ARIELS_WINGS_AMP));
         data.put(TrackPoint.ARIELS_WINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.05, DeltaCollection.DEFENSE_DEBUFF));
         data.put(TrackPoint.PURIFYING_LIGHT, new HitMissCollection(TrackPoint.PURIFYING_LIGHT_AMP));
-        data.put(TrackPoint.PURIFYING_LIGHT_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.06, DeltaCollection.DAMAGE_AMP)); //assumes max level
+        data.put(TrackPoint.PURIFYING_LIGHT_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.075, DeltaCollection.DAMAGE_AMP)); //assumes max level
         data.put(TrackPoint.HEAVENS_WRATH, new HitMissCollection());
         data.put(TrackPoint.GREATER_HEAL, new HitMissCollection());
         data.put(TrackPoint.VITALITY, new HitMissCollection());
@@ -582,7 +586,7 @@ public class MainDriver {
         //soul binder awakening
         data.put(TrackPoint.SOUL_DISSONANCE, new HitMissCollection());
         data.put(TrackPoint.SOUL_FLOCK, new HitMissCollection(TrackPoint.SOUL_FLOCK_AMP));
-        data.put(TrackPoint.SOUL_FLOCK_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.15, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.SOUL_FLOCK_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.18, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.VISION_TORRENT, new HitMissCollection());
 
         data.put(TrackPoint.STATIC_FLASH, new HitMissCollection(TrackPoint.STATIC_FLASH_AMP));
@@ -871,7 +875,7 @@ public class MainDriver {
 		    			m = r.exists(tp.getSecondaryImage(), 0.01);
 		    		}
 	    		}
-	    		if (tp.getName().contains("Soul Flock") && m != null) {
+	    		if ((tp.getName().contains("Infernog Bomb") || tp.getName().contains("Aggro")) && m != null) {
 	    			System.out.println(tp.getName()+": "+m.getScore());
 	    		}
 				hit = m != null && m.getScore() >= tp.getThreshold();

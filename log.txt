@@ -1,0 +1,498 @@
+Adding: null
+[]
+Adding: 7488445873
+[7488445873]
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Adding: 7078442766
+[7488445873, 7078442766]
+Update Delta. There are breaks: 1; dividing value, which is 410003107
+Update Delta. Adding value: 410003107
+Updating soft delta with: 410003107
+Breaks: 1
+Updating soft delta with: 410003107
+Update Delta. Adding value: 26240198
+Updating soft delta with: 26240198
+Update Delta. Adding value: 41000310
+Updating soft delta with: 41000310
+Update Delta. Adding value: 32800248
+Updating soft delta with: 32800248
+Update Delta. Adding value: 30750233
+Updating soft delta with: 30750233
+Update Delta. Adding value: 73800559
+Updating soft delta with: 73800559
+Update Delta. Adding value: 20500155
+Updating soft delta with: 20500155
+Update Delta. Adding value: 41000310
+Updating soft delta with: 41000310
+Update Delta. Adding value: 20500155
+Updating soft delta with: 20500155
+Update Delta. There are breaks: 1; dividing value, which is 410003107
+Update Delta. Adding value: 410003107
+Updating soft delta with: 410003107
+Breaks: 1
+Updating soft delta with: 410003107
+Total: 410003107; Raw: 410003107; preAmp: 410003107.00; preDefAmp: 410003107.00
+SYNERGY: 0
+Adding: null
+[7488445873, 7078442766, null]
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Adding: 6950047451
+[7488445873, 7078442766, null, 6950047451]
+Update Delta. There are breaks: 1; dividing value, which is 128395315
+Update Delta. Adding value: 128395315
+Updating soft delta with: 269199211
+Breaks: 1
+Updating soft delta with: 269199211
+Update Delta. There are breaks: 1; dividing value, which is 8217300
+Update Delta. Adding value: 8217300
+Updating soft delta with: 17228749
+Breaks: 1
+Updating soft delta with: 17228749
+Update Delta. There are breaks: 1; dividing value, which is 12839531
+Update Delta. Adding value: 12839531
+Updating soft delta with: 26919920
+Breaks: 1
+Updating soft delta with: 26919920
+Update Delta. There are breaks: 1; dividing value, which is 10271625
+Update Delta. Adding value: 10271625
+Updating soft delta with: 21535936
+Breaks: 1
+Updating soft delta with: 21535936
+Update Delta. There are breaks: 1; dividing value, which is 9629648
+Update Delta. Adding value: 9629648
+Updating soft delta with: 20189940
+Breaks: 1
+Updating soft delta with: 20189940
+Update Delta. There are breaks: 1; dividing value, which is 23111156
+Update Delta. Adding value: 23111156
+Updating soft delta with: 48455857
+Breaks: 1
+Updating soft delta with: 48455857
+Update Delta. There are breaks: 1; dividing value, which is 6419765
+Update Delta. Adding value: 6419765
+Updating soft delta with: 13459960
+Breaks: 1
+Updating soft delta with: 13459960
+Update Delta. There are breaks: 1; dividing value, which is 12839531
+Update Delta. Adding value: 12839531
+Updating soft delta with: 26919920
+Breaks: 1
+Updating soft delta with: 26919920
+Update Delta. There are breaks: 1; dividing value, which is 6419765
+Update Delta. Adding value: 6419765
+Updating soft delta with: 13459960
+Breaks: 1
+Updating soft delta with: 13459960
+Update Delta. There are breaks: 1; dividing value, which is 128395315
+Update Delta. Adding value: 128395315
+Updating soft delta with: 269199211
+Breaks: 1
+Updating soft delta with: 269199211
+Total: 538398422; Raw: 128395315; preAmp: 128395315.00; preDefAmp: 128395315.00
+SYNERGY: 0
+Adding: null
+[7488445873, 7078442766, null, 6950047451, null]
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Adding: 6657271287
+[7488445873, 7078442766, null, 6950047451, null, 6657271287]
+Update Delta. There are breaks: 1; dividing value, which is 292776164
+Update Delta. Adding value: 292776164
+Updating soft delta with: 277058195
+Breaks: 1
+Updating soft delta with: 277058195
+Update Delta. There are breaks: 1; dividing value, which is 18737674
+Update Delta. Adding value: 18737674
+Updating soft delta with: 17731724
+Breaks: 1
+Updating soft delta with: 17731724
+Update Delta. There are breaks: 1; dividing value, which is 29277616
+Update Delta. Adding value: 29277616
+Updating soft delta with: 27705819
+Breaks: 1
+Updating soft delta with: 27705819
+Update Delta. There are breaks: 1; dividing value, which is 23422093
+Update Delta. Adding value: 23422093
+Updating soft delta with: 22164655
+Breaks: 1
+Updating soft delta with: 22164655
+Update Delta. There are breaks: 1; dividing value, which is 21958212
+Update Delta. Adding value: 21958212
+Updating soft delta with: 20779364
+Breaks: 1
+Updating soft delta with: 20779364
+Update Delta. There are breaks: 1; dividing value, which is 52699709
+Update Delta. Adding value: 52699709
+Updating soft delta with: 49870474
+Breaks: 1
+Updating soft delta with: 49870474
+Update Delta. There are breaks: 1; dividing value, which is 14638808
+Update Delta. Adding value: 14638808
+Updating soft delta with: 13852909
+Breaks: 1
+Updating soft delta with: 13852909
+Update Delta. There are breaks: 1; dividing value, which is 29277616
+Update Delta. Adding value: 29277616
+Updating soft delta with: 27705819
+Breaks: 1
+Updating soft delta with: 27705819
+Update Delta. There are breaks: 1; dividing value, which is 14638808
+Update Delta. Adding value: 14638808
+Updating soft delta with: 13852909
+Breaks: 1
+Updating soft delta with: 13852909
+Update Delta. There are breaks: 1; dividing value, which is 292776164
+Update Delta. Adding value: 292776164
+Updating soft delta with: 277058195
+Breaks: 1
+Updating soft delta with: 277058195
+Total: 831174586; Raw: 292776164; preAmp: 292776164.00; preDefAmp: 292776164.00
+SYNERGY: 0
+Adding: 6588562299
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299]
+Update Delta. Adding value: 68708988
+Updating soft delta with: 224970893
+Update Delta. Adding value: 4397375
+Updating soft delta with: 14398136
+Update Delta. Adding value: 6870898
+Updating soft delta with: 22497088
+Update Delta. Adding value: 5496719
+Updating soft delta with: 17997671
+Update Delta. Adding value: 5153174
+Updating soft delta with: 16872816
+Update Delta. Adding value: 12367617
+Updating soft delta with: 40494760
+Update Delta. Adding value: 3435449
+Updating soft delta with: 11248544
+Update Delta. Adding value: 6870898
+Updating soft delta with: 22497088
+Update Delta. Adding value: 3435449
+Updating soft delta with: 11248544
+Update Delta. Adding value: 68708988
+Updating soft delta with: 224970893
+Total: 899883574; Raw: 68708988; preAmp: 68708988.00; preDefAmp: 68708988.00
+SYNERGY: 0
+Adding: null
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null]
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Adding: null
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null]
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Update Delta. Bad reading. Breaks: 2
+Adding: 6381846488
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488]
+Update Delta. There are breaks: 2; dividing value, which is 206715811
+Update Delta. Adding value: 103357905
+Update Delta. Adding value: 103357905
+Updating soft delta with: 184433230
+Breaks: 2
+Updating soft delta with: 184433230
+Breaks: 1
+Updating soft delta with: 184433230
+Update Delta. There are breaks: 2; dividing value, which is 13229811
+Update Delta. Adding value: 6614905
+Update Delta. Adding value: 6614905
+Updating soft delta with: 11803726
+Breaks: 2
+Updating soft delta with: 11803726
+Breaks: 1
+Updating soft delta with: 11803726
+Update Delta. There are breaks: 2; dividing value, which is 20671581
+Update Delta. Adding value: 10335790
+Update Delta. Adding value: 10335790
+Updating soft delta with: 18443322
+Breaks: 2
+Updating soft delta with: 18443322
+Breaks: 1
+Updating soft delta with: 18443322
+Update Delta. There are breaks: 2; dividing value, which is 16537264
+Update Delta. Adding value: 8268632
+Update Delta. Adding value: 8268632
+Updating soft delta with: 14754658
+Breaks: 2
+Updating soft delta with: 14754658
+Breaks: 1
+Updating soft delta with: 14754658
+Update Delta. There are breaks: 2; dividing value, which is 15503685
+Update Delta. Adding value: 7751842
+Update Delta. Adding value: 7751842
+Updating soft delta with: 13832491
+Breaks: 2
+Updating soft delta with: 13832491
+Breaks: 1
+Updating soft delta with: 13832491
+Update Delta. There are breaks: 2; dividing value, which is 37208845
+Update Delta. Adding value: 18604422
+Update Delta. Adding value: 18604422
+Updating soft delta with: 33197980
+Breaks: 2
+Updating soft delta with: 33197980
+Breaks: 1
+Updating soft delta with: 33197980
+Update Delta. There are breaks: 2; dividing value, which is 10335790
+Update Delta. Adding value: 5167895
+Update Delta. Adding value: 5167895
+Updating soft delta with: 9221661
+Breaks: 2
+Updating soft delta with: 9221661
+Breaks: 1
+Updating soft delta with: 9221661
+Update Delta. There are breaks: 2; dividing value, which is 20671581
+Update Delta. Adding value: 10335790
+Update Delta. Adding value: 10335790
+Updating soft delta with: 18443322
+Breaks: 2
+Updating soft delta with: 18443322
+Breaks: 1
+Updating soft delta with: 18443322
+Update Delta. There are breaks: 2; dividing value, which is 10335790
+Update Delta. Adding value: 5167895
+Update Delta. Adding value: 5167895
+Updating soft delta with: 9221661
+Breaks: 2
+Updating soft delta with: 9221661
+Breaks: 1
+Updating soft delta with: 9221661
+Update Delta. There are breaks: 2; dividing value, which is 206715811
+Update Delta. Adding value: 103357905
+Update Delta. Adding value: 103357905
+Updating soft delta with: 184433230
+Breaks: 2
+Updating soft delta with: 184433230
+Breaks: 1
+Updating soft delta with: 184433230
+Total: 1106599385; Raw: 206715811; preAmp: 206715811.00; preDefAmp: 206715811.00
+SYNERGY: 0
+Adding: 6319033185
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185]
+Update Delta. Adding value: 62813303
+Updating soft delta with: 126568263
+Update Delta. Adding value: 4020051
+Updating soft delta with: 8100368
+Update Delta. Adding value: 6281330
+Updating soft delta with: 12656825
+Update Delta. Adding value: 5025064
+Updating soft delta with: 10125460
+Update Delta. Adding value: 4710997
+Updating soft delta with: 9492619
+Update Delta. Adding value: 11306394
+Updating soft delta with: 22782286
+Update Delta. Adding value: 3140665
+Updating soft delta with: 6328412
+Update Delta. Adding value: 6281330
+Updating soft delta with: 12656825
+Update Delta. Adding value: 3140665
+Updating soft delta with: 6328412
+Update Delta. Adding value: 62813303
+Updating soft delta with: 126568263
+Total: 1169412688; Raw: 62813303; preAmp: 62813303.00; preDefAmp: 62813303.00
+SYNERGY: 0
+Adding: 6216715169
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169]
+Update Delta. Adding value: 102318016
+Updating soft delta with: 122222046
+Update Delta. Adding value: 6548353
+Updating soft delta with: 7822210
+Update Delta. Adding value: 10231801
+Updating soft delta with: 12222204
+Update Delta. Adding value: 8185441
+Updating soft delta with: 9777763
+Update Delta. Adding value: 7673851
+Updating soft delta with: 9166653
+Update Delta. Adding value: 18417242
+Updating soft delta with: 21999967
+Update Delta. Adding value: 5115900
+Updating soft delta with: 6111102
+Update Delta. Adding value: 10231801
+Updating soft delta with: 12222204
+Update Delta. Adding value: 5115900
+Updating soft delta with: 6111102
+Update Delta. Adding value: 102318016
+Updating soft delta with: 122222046
+Total: 1271730704; Raw: 102318016; preAmp: 102318016.00; preDefAmp: 102318016.00
+SYNERGY: 0
+Adding: null
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169, null]
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Adding: 6071739174
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169, null, 6071739174]
+Update Delta. There are breaks: 1; dividing value, which is 144975995
+Update Delta. Adding value: 144975995
+Updating soft delta with: 97588685
+Breaks: 1
+Updating soft delta with: 97588685
+Update Delta. There are breaks: 1; dividing value, which is 9278463
+Update Delta. Adding value: 9278463
+Updating soft delta with: 6245675
+Breaks: 1
+Updating soft delta with: 6245675
+Update Delta. There are breaks: 1; dividing value, which is 14497599
+Update Delta. Adding value: 14497599
+Updating soft delta with: 9758868
+Breaks: 1
+Updating soft delta with: 9758868
+Update Delta. There are breaks: 1; dividing value, which is 11598079
+Update Delta. Adding value: 11598079
+Updating soft delta with: 7807094
+Breaks: 1
+Updating soft delta with: 7807094
+Update Delta. There are breaks: 1; dividing value, which is 10873199
+Update Delta. Adding value: 10873199
+Updating soft delta with: 7319150
+Breaks: 1
+Updating soft delta with: 7319150
+Update Delta. There are breaks: 1; dividing value, which is 26095679
+Update Delta. Adding value: 26095679
+Updating soft delta with: 17565962
+Breaks: 1
+Updating soft delta with: 17565962
+Update Delta. There are breaks: 1; dividing value, which is 7248799
+Update Delta. Adding value: 7248799
+Updating soft delta with: 4879433
+Breaks: 1
+Updating soft delta with: 4879433
+Update Delta. There are breaks: 1; dividing value, which is 14497599
+Update Delta. Adding value: 14497599
+Updating soft delta with: 9758868
+Breaks: 1
+Updating soft delta with: 9758868
+Update Delta. There are breaks: 1; dividing value, which is 7248799
+Update Delta. Adding value: 7248799
+Updating soft delta with: 4879433
+Breaks: 1
+Updating soft delta with: 4879433
+Update Delta. There are breaks: 1; dividing value, which is 144975995
+Update Delta. Adding value: 144975995
+Updating soft delta with: 97588685
+Breaks: 1
+Updating soft delta with: 97588685
+Total: 1416706699; Raw: 144975995; preAmp: 144975995.00; preDefAmp: 144975995.00
+SYNERGY: 0
+Adding: 5971921513
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169, null, 6071739174, 5971921513]
+Update Delta. Adding value: 99817661
+Updating soft delta with: 102773464
+Update Delta. Adding value: 6388330
+Updating soft delta with: 6577501
+Update Delta. Adding value: 9981766
+Updating soft delta with: 10277346
+Update Delta. Adding value: 7985412
+Updating soft delta with: 8221876
+Update Delta. Adding value: 7486324
+Updating soft delta with: 7708009
+Update Delta. Adding value: 17967178
+Updating soft delta with: 18499222
+Update Delta. Adding value: 4990883
+Updating soft delta with: 5138672
+Update Delta. Adding value: 9981766
+Updating soft delta with: 10277346
+Update Delta. Adding value: 4990883
+Updating soft delta with: 5138672
+Update Delta. Adding value: 99817661
+Updating soft delta with: 102773464
+Total: 1516524360; Raw: 99817661; preAmp: 99817661.00; preDefAmp: 99817661.00
+SYNERGY: 0
+Adding: 5896406254
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169, null, 6071739174, 5971921513, 5896406254]
+Update Delta. Adding value: 75515259
+Updating soft delta with: 98133023
+Update Delta. Adding value: 4832976
+Updating soft delta with: 6280513
+Update Delta. Adding value: 7551525
+Updating soft delta with: 9813301
+Update Delta. Adding value: 6041220
+Updating soft delta with: 7850641
+Update Delta. Adding value: 5663644
+Updating soft delta with: 7359976
+Update Delta. Adding value: 13592746
+Updating soft delta with: 17663943
+Update Delta. Adding value: 3775762
+Updating soft delta with: 4906650
+Update Delta. Adding value: 7551525
+Updating soft delta with: 9813301
+Update Delta. Adding value: 3775762
+Updating soft delta with: 4906650
+Update Delta. Adding value: 75515259
+Updating soft delta with: 98133023
+Total: 1592039619; Raw: 75515259; preAmp: 75515259.00; preDefAmp: 75515259.00
+SYNERGY: 0
+Adding: 5825521132
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169, null, 6071739174, 5971921513, 5896406254, 5825521132]
+Update Delta. Adding value: 70885122
+Updating soft delta with: 92720892
+Update Delta. Adding value: 4536647
+Updating soft delta with: 5934136
+Update Delta. Adding value: 7088512
+Updating soft delta with: 9272088
+Update Delta. Adding value: 5670809
+Updating soft delta with: 7417670
+Update Delta. Adding value: 5316384
+Updating soft delta with: 6954066
+Update Delta. Adding value: 12759321
+Updating soft delta with: 16689760
+Update Delta. Adding value: 3544256
+Updating soft delta with: 4636044
+Update Delta. Adding value: 7088512
+Updating soft delta with: 9272088
+Update Delta. Adding value: 3544256
+Updating soft delta with: 4636044
+Update Delta. Adding value: 70885122
+Updating soft delta with: 92720892
+Total: 1662924741; Raw: 70885122; preAmp: 70885122.00; preDefAmp: 70885122.00
+SYNERGY: 0
+Adding: null
+[7488445873, 7078442766, null, 6950047451, null, 6657271287, 6588562299, null, null, 6381846488, 6319033185, 6216715169, null, 6071739174, 5971921513, 5896406254, 5825521132, null]
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
+Update Delta. Bad reading. Breaks: 1
