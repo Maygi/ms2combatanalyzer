@@ -110,7 +110,7 @@ public class Resolution {
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 + 70) + getBossOffset(), 76,
 				(int) (screenSize.getWidth() / 2 + 140 + 198 + 70) + getBossOffset(), 76 + 29});
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 366) + getBossOffset(), 80,
-				(int) (screenSize.getWidth() / 2 - 366 + 50) + getBossOffset(), 140});
+				(int) (screenSize.getWidth() / 2 - 366 + 70) + getBossOffset(), 140}); //boss icon
 		/*baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 315), 77,
 				(int) (screenSize.getWidth() / 2 - 275), 102});*/
 		baseRegion.add(new Integer[]{(int) (screenSize.getWidth() / 2 - 10), (int) (screenSize.getHeight() - 255),

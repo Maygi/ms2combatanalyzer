@@ -125,7 +125,7 @@ public class MainDriver {
 		
 		//priest awakening
 		ARIELS_WINGS("Ariel's Wings", "Decreases defense of target", "arielswings.png", "arielswings2.png", Resolution.BOSS_DEBUFFS, 0.999),
-		PURIFYING_LIGHT("Purifying Light", "Decreases defense of target", "purifyinglight.png", Resolution.BOSS_DEBUFFS, 0.999),
+		PURIFYING_LIGHT("Purifying Light", "Increases damage taken by target", "purifyinglight.png", Resolution.BOSS_DEBUFFS, 0.999),
 		VITALITY("Vitality", "Increased physical and magic attack", "vitality.png", Resolution.BUFFS, 0.999),
 		GREATER_HEAL("Greater Heal", "Restoring health over time. 50% of this uptime is a damage buff", "greaterheal.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
 		HEAVENS_WRATH("Heaven's Wrath", "Increased stamina recovery, max health, movespeed, and access to Light Sword", "lightsword.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
@@ -539,7 +539,7 @@ public class MainDriver {
         data.put(TrackPoint.SHIELD_MASTERY, new HitMissCollection());
         data.put(TrackPoint.SPIRIT, new HitMissCollection());
         data.put(TrackPoint.HOLY_SYMBOL, new HitMissCollection());
-        data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection(Sound.PROC, 21));
+        data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection()); //Sound.PROC, 21));
         data.put(TrackPoint.DUNGEON_COMPLETE, new HitMissCollection());
         data.put(TrackPoint.TOMBSTONE, new HitMissCollection());
         data.put(TrackPoint.VARR_WINGS, new HitMissCollection(Sound.PROC, 10));
@@ -875,7 +875,7 @@ public class MainDriver {
 		    			m = r.exists(tp.getSecondaryImage(), 0.01);
 		    		}
 	    		}
-	    		if ((tp.getName().contains("Infernog Bomb") || tp.getName().contains("Aggro")) && m != null) {
+	    		if ((tp.getName().contains("Purify") || tp.getName().contains("Aggro")) && m != null) {
 	    			System.out.println(tp.getName()+": "+m.getScore());
 	    		}
 				hit = m != null && m.getScore() >= tp.getThreshold();
@@ -988,6 +988,9 @@ public class MainDriver {
 	    			m = r2.exists(TrackPoint.BOSS.getImage(), 0.01);
 	    			if (m == null) {
 		    			m = r2.exists(TrackPoint.BOSS.getSecondaryImage(), 0.01);
+	    			}
+	    			if (m == null) {
+		    			m = r2.exists("images/sikuli/boss3.png", 0.01);
 	    			}
 	    			if (m == null) {
 	    				System.out.println("Found HP: "+value+", but unable to find [Boss] tag.");

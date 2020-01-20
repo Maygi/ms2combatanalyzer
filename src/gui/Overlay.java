@@ -320,8 +320,8 @@ public class Overlay extends AbstractLabel {
 	        for (int i = 0; i < DEBUFFS.length; i++) {
 		        DataCollection dc = MainDriver.data.get(DEBUFFS[i]);
 		        StringBuilder sb = new StringBuilder();
-		        if (new BigInteger(dc.getLastAsString()).compareTo(BigInteger.ZERO) <= 0)
-		        	continue;
+		        //if (new BigInteger(dc.getLastAsString()).compareTo(BigInteger.ZERO) <= 0)
+		        //	continue;
 		        sb.append(dc.getLastAsString());
 				sb.append("%");
 				if (DEBUFFS[i].getName().contains("Smiting")) {
