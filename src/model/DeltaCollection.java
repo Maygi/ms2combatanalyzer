@@ -17,7 +17,8 @@ public class DeltaCollection extends DataCollection {
 	
 	public static final int DAMAGE_AMP = 0;
 	public static final int DEFENSE_DEBUFF = 1;
-	public static final int OTHER = 2;
+	public static final int ATTACK_BUFF = 2;
+	public static final int OTHER = 3;
 	
 	/**
 	 * Readings of the last, and second last HP values.
@@ -242,7 +243,7 @@ public class DeltaCollection extends DataCollection {
 			count++;
 		}
 		if (count == 0) {
-			MainDriver.logOutput.println("Updating soft delta with count0: "+(deltas.get(deltas.size() - 1)));
+			MainDriver.logOutput.println("Updating soft delta with count: "+(deltas.get(deltas.size() - 1)));
 			softDeltas.add(deltas.get(deltas.size() - 1));
 		} else {
 			total = total.divide(new BigInteger(Integer.toString(count)));
@@ -268,42 +269,61 @@ public class DeltaCollection extends DataCollection {
 		
 		int index = realData.size() - 1;
 		
-		DeltaCollection smiteColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SMITE_AMP));
-		DeltaCollection modColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.MOD_AMP));
-		DeltaCollection plColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.PURIFYING_LIGHT_AMP));
-		DeltaCollection madColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.MADRIA_AMP));
-		DeltaCollection[] damageAmp = {
-			smiteColl, modColl, plColl, madColl
+		//damage amplification effects
+		TrackPoint[] damageAmpColl = {
+			TrackPoint.SMITE_AMP, TrackPoint.MOD_AMP, TrackPoint.PURIFYING_LIGHT_AMP, TrackPoint.MADRIA_AMP
 		};
+		DeltaCollection[] damageAmp = new DeltaCollection[damageAmpColl.length];
+		for (int i = 0; i < damageAmpColl.length; i++) {
+			damageAmp[i] = (DeltaCollection)(MainDriver.data.get(damageAmpColl[i]));
+		}
 		TrackPoint[] damageAmpTp = {
 			TrackPoint.SMITE, TrackPoint.MOD, TrackPoint.PURIFYING_LIGHT, TrackPoint.MADRIA
 		};
-
-		DeltaCollection sfColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.STATIC_FLASH_AMP));
-		DeltaCollection stColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SHIELDTOSS_AMP));
-		DeltaCollection csColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.CYCLONE_SHIELD_AMP));
-		DeltaCollection birdColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.SOUL_FLOCK_AMP));
-		DeltaCollection arielColl = (DeltaCollection)(MainDriver.data.get(TrackPoint.ARIELS_WINGS_AMP));
-		DeltaCollection[] defDebuff = {
-			sfColl, stColl, csColl, birdColl, arielColl
+		
+		//attack buffs effects
+		TrackPoint[] attackBuffColl = {
+			TrackPoint.BLESSINGS_AMP, TrackPoint.VITALITY_AMP, TrackPoint.WARHORN_AMP, TrackPoint.FOCUSSEAL_AMP, TrackPoint.EAGLESQUAD_AMP
 		};
+		DeltaCollection[] attackBuff = new DeltaCollection[attackBuffColl.length];
+		for (int i = 0; i < attackBuffColl.length; i++) {
+			attackBuff[i] = (DeltaCollection)(MainDriver.data.get(attackBuffColl[i]));
+		}
+		TrackPoint[] attackBuffTp = {
+			TrackPoint.BLESSINGS, TrackPoint.VITALITY, TrackPoint.WARHORN, TrackPoint.FOCUSSEAL, TrackPoint.EAGLE_SQUAD
+		};
+
+		//defense debuff effects
+		TrackPoint[] defDebuffColl = {
+			TrackPoint.STATIC_FLASH_AMP, TrackPoint.SHIELDTOSS_AMP, TrackPoint.CYCLONE_SHIELD_AMP,
+			TrackPoint.SOUL_FLOCK_AMP,TrackPoint.ARIELS_WINGS_AMP
+		};
+		DeltaCollection[] defDebuff = new DeltaCollection[defDebuffColl.length];
+		for (int i = 0; i < defDebuffColl.length; i++) {
+			defDebuff[i] = (DeltaCollection)(MainDriver.data.get(defDebuffColl[i]));
+		}
 		TrackPoint[] defDebuffTp = {
-			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD, TrackPoint.SOUL_FLOCK,
-			TrackPoint.ARIELS_WINGS
+			TrackPoint.STATIC_FLASH, TrackPoint.SHIELDTOSS, TrackPoint.CYCLONE_SHIELD,
+			TrackPoint.SOUL_FLOCK, TrackPoint.ARIELS_WINGS
 		};
 
 		index--; //collections have 1 less entry than hp
-		//calculate pre-damage amp value
+		//calculate the total dmg amp
 		double totalAmp = 1;
+		double totalDamageAmp = 1;
+		double totalMultipliers = 0; //to calculate portions
 		for (int i = 0; i < damageAmp.length; i++) {
 			List<Boolean> list = ((HitMissCollection)(MainDriver.data.get(damageAmpTp[i]))).getRawData();
 			index = list.size() - 1;
 			boolean hit = list.get(index);
-			totalAmp += hit ? damageAmp[i].getMultiplier() : 0;
+			totalDamageAmp += hit ? damageAmp[i].getMultiplier() : 0;
 		}
+		totalMultipliers += totalDamageAmp - 1;
+		totalAmp = totalDamageAmp;
+		//unused - old calculation assumed one applied before the other
 		BigDecimal preAmp = new BigDecimal(rawDamage.doubleValue()).divide(new BigDecimal(totalAmp), 2, RoundingMode.HALF_UP);
 
-		//use pre-damage amp value to calculate pre-defense debuff value
+		//calculate the damage amp from defense shred
 		double defFactor = 0;
 		for (int i = 0; i < defDebuff.length; i++) {
 			List<Boolean> list = ((HitMissCollection)(MainDriver.data.get(defDebuffTp[i]))).getRawData();
@@ -312,33 +332,67 @@ public class DeltaCollection extends DataCollection {
 			defFactor += hit ? defDebuff[i].getMultiplier() : 0;
 		}
 		double totalDefAmp = 1 / (1 - defFactor);
-		BigDecimal preDefAmp = preAmp.divide(new BigDecimal(totalDefAmp), 2, RoundingMode.HALF_UP);
+		totalAmp *= totalDefAmp;
+		totalMultipliers += totalDefAmp - 1;
 		
-		MainDriver.logOutput.println("Total: "+totalDamageCounted.toString()+"; Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
-		BigDecimal totalDebuff = BigDecimal.ZERO;
+		BigDecimal preDefAmp = preAmp.divide(new BigDecimal(totalDefAmp), 2, RoundingMode.HALF_UP);
+
+		//calculate the total attack buffs
+		double attackMultiplier = 1;
+		for (int i = 0; i < attackBuff.length; i++) {
+			List<Boolean> list = ((HitMissCollection)(MainDriver.data.get(attackBuffTp[i]))).getRawData();
+			index = list.size() - 1;
+			boolean hit = list.get(index);
+			attackMultiplier += hit ? attackBuff[i].getMultiplier() : 0;
+		}
+		totalAmp *= attackMultiplier;
+		totalMultipliers += attackMultiplier - 1;
+		if (totalMultipliers == 0)
+			return;
+
+		BigDecimal preBuffDamage = new BigDecimal(rawDamage.doubleValue()).divide(new BigDecimal(totalAmp), 2, RoundingMode.HALF_UP);
+		BigDecimal damageGained = new BigDecimal(rawDamage.doubleValue()).subtract(preBuffDamage);
+		BigDecimal damageGainedFromDefDebuff = damageGained.multiply(new BigDecimal((totalDefAmp - 1) / totalMultipliers));
+		BigDecimal damageGainedFromDmgAmp = damageGained.multiply(new BigDecimal((totalDamageAmp - 1) / totalMultipliers));
+		BigDecimal damageGainedFromAttackBuff = damageGained.multiply(new BigDecimal((attackMultiplier - 1) / totalMultipliers));
+		MainDriver.logOutput.println("Total: "+totalDamageCounted.toString()+"; Raw: "+rawDamage.toString()+"; total amp: "+totalAmp+
+				"; preBuff: "+preBuffDamage.toString()+"; from def: "+damageGainedFromDefDebuff.toString()+
+				"; from dmg amp: "+damageGainedFromDmgAmp.toString()+"; from attack buff: "+
+				damageGainedFromAttackBuff.toString());
+		//MainDriver.logOutput.println("Total: "+totalDamageCounted.toString()+"; Raw: "+rawDamage.toString()+"; preAmp: "+preAmp+"; preDefAmp: "+preDefAmp);
+		
 		for (int i = 0; i < defDebuffTp.length; i++) {
 			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%)
 			boolean hit = ((HitMissCollection)(MainDriver.data.get(defDebuffTp[i]))).getRawData().get(index);
 			if (!hit)
-				continue;			
+				continue;
 			double totalDefPortion = defFactor == 0 ? 0 : defDebuff[i].getMultiplier() / defFactor;
-			BigDecimal contribution = preAmp.subtract(preDefAmp).multiply(new BigDecimal(totalDefPortion));
+			BigDecimal contribution = damageGainedFromDefDebuff.multiply(new BigDecimal(totalDefPortion));
 			MainDriver.logOutput.println(defDebuffTp[i].getName()+" - Total def debuff: "+defFactor+": portion: "+totalDefPortion+"; contribution: "+contribution.toString());
 			defDebuff[i].addDataFinal(contribution);
-			totalDebuff = totalDebuff.add(contribution);
 		}
 		for (int i = 0; i < damageAmpTp.length; i++) {
 			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%))
 			boolean hit = ((HitMissCollection)(MainDriver.data.get(damageAmpTp[i]))).getRawData().get(index);
 			if (!hit)
-				continue;			
-			BigDecimal contribution = preDefAmp.multiply(new BigDecimal(damageAmp[i].getMultiplier()));
+				continue;
+			double damageAmpPortion = damageAmp[i].getMultiplier() / (totalDamageAmp - 1);
+			BigDecimal contribution = damageGainedFromDmgAmp.multiply(new BigDecimal(damageAmpPortion));
 			MainDriver.logOutput.println(damageAmpTp[i].getName()+" - contribution: "+contribution.toString());
 			damageAmp[i].addDataFinal(contribution);
-			totalDebuff = totalDebuff.add(contribution);
 		}
-		BigInteger synergy = rawDamage.subtract(preDefAmp.toBigInteger()).subtract(totalDebuff.toBigInteger());
-		MainDriver.logOutput.println("SYNERGY: "+synergy.toString());
+		for (int i = 0; i < attackBuffTp.length; i++) {
+			//the total portal of the defense debuff. e.g. if there's a 5% and 10% active (total 15%, 5% is 33%))
+			boolean hit = ((HitMissCollection)(MainDriver.data.get(attackBuffTp[i]))).getRawData().get(index);
+			if (!hit)
+				continue;
+			double portion = attackBuff[i].getMultiplier() / (attackMultiplier - 1);
+			BigDecimal contribution = damageGainedFromAttackBuff.multiply(new BigDecimal(portion));
+			MainDriver.logOutput.println(attackBuffTp[i].getName()+" - contribution: "+contribution.toString());
+			attackBuff[i].addDataFinal(contribution);
+		}
+		//BigInteger synergy = rawDamage.subtract(preDefAmp.toBigInteger()).subtract(totalDebuff.toBigInteger());
+		//MainDriver.logOutput.println("SYNERGY: "+synergy.toString());
 	}
 	
 	public void addDataFinal(BigDecimal value) {
@@ -352,12 +406,13 @@ public class DeltaCollection extends DataCollection {
 			return;
 		if (flag || type == OTHER) {
 			BigDecimal decimal = addData ? new BigDecimal((secondLast.subtract(last).toString())) : BigDecimal.ZERO;
-			BigInteger toAdd = addData ? new BigInteger(Integer.toString(decimal.multiply(new BigDecimal(multiplier)).intValue())) : BigInteger.ZERO;
+			BigInteger toAdd = addData ? (decimal.multiply(new BigDecimal(multiplier))).toBigInteger() : BigInteger.ZERO;
 			if (type == OTHER && addData) {
 				total = total.add(toAdd);
 			}/* else {
 				deltas.add(deltas.size() == 0 ? 0 : deltas.get(deltas.size() - 1));
 			}*/
+			MainDriver.logOutput.println("Decimal: "+decimal+", toAdd: "+toAdd+", addData: "+addData+", multiplier: "+multiplier);
 			updateDelta(addData, toAdd);
 			updateSoftDelta(addData);
 			if (type == OTHER)

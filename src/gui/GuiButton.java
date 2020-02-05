@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 import model.MainDriver;
 
 public enum GuiButton {
+	PARTY_DPS(30, 160 + 24, "images/ui/button.png", "Party DPS"),
+	BUFF_BREAKDOWN(30, 195 + 24, "images/ui/button.png", "Buff/Debuff rDPS"),
 	PERSONAL(30, 400 + 24, "images/ui/button.png", "Personal"),
 	BUFFS(30, 435 + 24, "images/ui/button.png", "Buffs"),
 	DEBUFFS(30, 470 + 24, "images/ui/button.png", "Debuffs"),
@@ -24,6 +26,7 @@ public enum GuiButton {
 	PAUSE(425, 12, "images/ui/pause.png"),
 	RESET(450, 12, "images/ui/reset.png"),
 	REPORT(475, 37, "images/ui/report.png"),
+	MINIMIZE(450, 37, "images/ui/minimize.png"),
 	CLOSE(475, 12, "images/ui/close.png");
 	
 	private static final int FONT_SIZE = 20;
@@ -51,6 +54,8 @@ public enum GuiButton {
 		return text;
 	}
 	public String getImage() {
+		if (image.contains("minimize") && OverlayFrame.compact)
+			return "images/ui/maximize.png";
 		return image;
 	}
 	public boolean isActive() {
@@ -76,6 +81,9 @@ public enum GuiButton {
 	}
 	public void handleDraw(AbstractLabel label, Graphics theGraphics) {
     	int[] coords = getCoords();
+    	if (OverlayFrame.compact) {
+    		coords[1] += OverlayFrame.HEIGHT / 2 - OverlayFrame.COMPACT_HEIGHT / 2;
+    	}
         label.drawImage(theGraphics, getImage(), coords[0],  coords[1]);
         Point p = MouseInfo.getPointerInfo().getLocation();
         active = true;
@@ -92,7 +100,11 @@ public enum GuiButton {
         		active = false;
         }
         if (getText().length() > 0) {
-        	if (!((Graph)label).currentTab.equalsIgnoreCase(getText())) {
+    		if (getText().contains("Party") || getText().contains("rDPS")) {
+            	if (!((Graph)label).currentView.equalsIgnoreCase(getText())) {
+            		active = false;
+            	}
+    		} else if (!((Graph)label).currentTab.equalsIgnoreCase(getText())) {
         		active = false;
         	}
         }

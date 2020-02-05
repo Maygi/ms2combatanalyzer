@@ -74,10 +74,16 @@ public class GraphFrame extends AbstractFrame {
 	                			}
 	                		}
 	                	} else {
-		                	if (!myGraph.currentTab.equalsIgnoreCase(b.getText()))
-		                		Sound.SELECT.play();	 
-		                	myGraph.currentTab = b.getText();
-		                	myGraph.currentPage = 0;
+	                		if (b.getText().contains("Party") || b.getText().contains("rDPS")) {
+			                	if (!myGraph.currentView.equalsIgnoreCase(b.getText()))
+			                		Sound.SELECT.play();	 
+			                	myGraph.currentView = b.getText();
+	                		} else {
+			                	if (!myGraph.currentTab.equalsIgnoreCase(b.getText()))
+			                		Sound.SELECT.play();	 
+			                	myGraph.currentTab = b.getText();
+			                	myGraph.currentPage = 0;
+	                		}
 	                	}
 	                	myGraph.repaint();
 	                	resetTooltips();

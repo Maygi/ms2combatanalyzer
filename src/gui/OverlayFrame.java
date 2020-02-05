@@ -27,6 +27,10 @@ import sound.Sound;
  */
 public class OverlayFrame extends AbstractFrame {
 	
+	private static final boolean STREAM_MODE = false;
+	
+	public static boolean compact = false;
+	
 	private final SpringLayout myLayout;
 	
 	private final Overlay myChart;
@@ -36,8 +40,9 @@ public class OverlayFrame extends AbstractFrame {
 	private int x;
     private int y;
     
-    private static final int WIDTH = 500;
-    private static final int HEIGHT = 260;
+    public static final int WIDTH = 500;
+    public static final int HEIGHT = 260;
+    public static final int COMPACT_HEIGHT = 80;
     
     private boolean hover = false;
 
@@ -52,7 +57,7 @@ public class OverlayFrame extends AbstractFrame {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(WIDTH, HEIGHT);
+        return new Dimension(WIDTH, compact ? COMPACT_HEIGHT : HEIGHT);
     }
     
     /**
@@ -101,9 +106,10 @@ public class OverlayFrame extends AbstractFrame {
         setAutoRequestFocus(false);
         setFocusableWindowState(false);
         
-        //disable these for stream-friendliness - also toggle comment on y offset
-        setUndecorated(true);
-        setBackground(new Color(0, 0, 0, 0));
+        if (!STREAM_MODE) {
+	        setUndecorated(true);
+	        setBackground(new Color(0, 0, 0, 0));
+        }
         
         setAlwaysOnTop(true);
         
@@ -122,9 +128,12 @@ public class OverlayFrame extends AbstractFrame {
             	int offY = (that.getHeight() - HEIGHT) / 2;
             	x -= offX;
             	y -= offY;
-            	//y -= 15; //for undecorated 
+            	if (STREAM_MODE)
+            		y -= 15; //for undecorated 
 	            for (final GuiButton b : GuiButton.class.getEnumConstants()) {
 	            	int[] coords = b.getCoords();
+	            	if (compact) //we need this for click for some reason
+	            		coords[1] += OverlayFrame.HEIGHT / 2 - OverlayFrame.COMPACT_HEIGHT / 2;
 	                if (x >= coords[0] && x <= coords[0] +  b.getWidth()  &&
 	                		y >= coords[1] && y <= coords[1] + b.getHeight()) {
 	                	if (b.getImage().contains("report")) {
@@ -141,6 +150,21 @@ public class OverlayFrame extends AbstractFrame {
 	                	}
 	                	if (b.getImage().contains("reset")) {
 	                		MainDriver.reset();
+	                	}
+	                	if (b.getImage().contains("minimize")) {
+	                		compact = true;
+	                		Sound.SELECT.play();
+	                        setMinimumSize(getPreferredSize());
+	                        setSize(getPreferredSize());
+	                		//setLocation(that.getX(), that.getY() + (HEIGHT - COMPACT_HEIGHT));
+	                        refresh();
+	                	} else if (b.getImage().contains("maximize")) {
+	                		compact = false;
+	                		Sound.SELECT.play();
+	                        setMinimumSize(getPreferredSize());
+	                        setSize(getPreferredSize());
+	                		//setLocation(that.getX(), that.getY() - (HEIGHT - COMPACT_HEIGHT));
+	                        refresh();
 	                	}
 	                	if (b.getImage().contains("close")) {
 	                		MainDriver.saveProps();

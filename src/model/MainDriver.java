@@ -33,7 +33,7 @@ import util.VersionCheck;
  */
 public class MainDriver {
 	
-	public static final String VERSION = "3.1";
+	public static final String VERSION = "3.2";
 	
 	private static final int DEFAULT_WIDTH = 1920;
 	private static final int DEFAULT_HEIGHT = 1080;
@@ -61,6 +61,7 @@ public class MainDriver {
 	 * The coordinates are the values of the upper left / bottom right corners around the region to be viewed for a certain TrackPoint.
 	 */
 	public enum TrackPoint {
+		ACC_DEBUFF("Accuracy debuff", "Accuracy decreased", "accdebuff.png", Resolution.DEBUFFS, 0.999),
 		
 		//debuffs
 		SMITE("Smiting Aura", "Increases damage taken by target", "smitingaura.png", Resolution.BOSS_DEBUFFS),
@@ -106,7 +107,7 @@ public class MainDriver {
 		
 		// lapenshards
 		BJORNS_ARTISTRY("Bjorn's Artistry", "Increases attack speed", "bjornsartistry.png", Resolution.BUFFS, 0.999),
-		PINK_BEANS_PRANK("Pink Bean's Prank", "Increases physical and magic attack", "pinkbeansprank.png", Resolution.BUFFS, 0.999),
+		PINK_BEANS_PRANK("Pink Bean's Prank", "Increases physical and magic attack %", "pinkbeansprank.png", Resolution.BUFFS, 0.995),
 		LUMARIGONS_PRIDE("Lumarigon's Pride", "Increases physical and magic attack, but decreases defense", "lumarigonspride.png", Resolution.BUFFS, 0.999),
 		
 		//wizard awakening
@@ -119,15 +120,16 @@ public class MainDriver {
 		CHILL("Chill", "Target takes bonus damage from thunderbolt", "chill.png", Resolution.BOSS_DEBUFFS, 0.9995, ClassConstants.WIZARD),
 		
 		//sb awakening
+		SOUL_CRYSTAL("Soul Crystal", "Target takes bonus damage on hit", "soulcrystal.png", Resolution.BOSS_DEBUFFS, 0.998, ClassConstants.SOUL_BINDER),
 		SOUL_DISSONANCE("Soul Dissonance", "Decreases evasion and critical evasion of target", "souldissonance.png", Resolution.BOSS_DEBUFFS, 0.998),
-		SOUL_FLOCK("Soul Flock - 5 stacks", "Decreases defense of target", "soulflock5-1.png", "soulflock5-2.png", "soulflock.png", Resolution.BOSS_DEBUFFS, 0.7),
+		SOUL_FLOCK("Soul Flock - 5 stacks", "Decreases defense of target", "soulflock5-1.png", Resolution.BOSS_DEBUFFS, 0.998),
 		VISION_TORRENT("Vision Torrent", "Increases magic attack and enhances skills", "visiontorrent.png", Resolution.BUFFS, 0.999, ClassConstants.SOUL_BINDER),
 		
 		//priest awakening
-		ARIELS_WINGS("Ariel's Wings", "Decreases defense of target", "arielswings.png", "arielswings2.png", Resolution.BOSS_DEBUFFS, 0.999),
+		ARIELS_WINGS("Ariel's Wings", "Decreases defense of target", "arielswings.png", "arielswings2.png", Resolution.BOSS_DEBUFFS, 0.9995),
 		PURIFYING_LIGHT("Purifying Light", "Increases damage taken by target", "purifyinglight.png", Resolution.BOSS_DEBUFFS, 0.999),
 		VITALITY("Vitality", "Increased physical and magic attack", "vitality.png", Resolution.BUFFS, 0.999),
-		GREATER_HEAL("Greater Heal", "Restoring health over time. 50% of this uptime is a damage buff", "greaterheal.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
+		GREATER_HEAL("Greater Heal", "Damage increased by 37%", "greaterheal.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
 		HEAVENS_WRATH("Heaven's Wrath", "Increased stamina recovery, max health, movespeed, and access to Light Sword", "lightsword.png", Resolution.BUFFS, 0.999, ClassConstants.PRIEST),
 		
 		//archer awakening
@@ -136,7 +138,8 @@ public class MainDriver {
 		WIND_DRAW("Full Wind Draw", "Archer's secrets is ready", "winddraw.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
 		RANGERS_FOCUS("Ranger's Focus", "Increases physical attack and enables Flame Arrow IV", "rangersfocus.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
 		ARCHERS_SECRETS("Archer's Secrets", "Increases piercing and accuracy, and enables enhanced skills", "archerssecrets.png", Resolution.BUFFS, 0.999, ClassConstants.ARCHER),
-		GREATER_SHARP_EYES("Greater Sharp Eyes", "Increases physical attack of caster", "greatersharpeyes.png", Resolution.BUFFS, 0.999),
+		GREATER_SHARP_EYES("Greater Sharp Eyes", "Increases accuracy and critical rate", "greatersharpeyes.png", Resolution.BUFFS, 0.999),
+		EAGLE_SQUAD("Eagle Squad", "Increases physical and magic attack by 10%", "eaglesquad.png", Resolution.BUFFS, 0.999),
 		
 		//knight awakening
 		CYCLONE_SHIELD("Cyclone Shield", "Decreases defense of target", "cycloneshield.png", Resolution.BOSS_DEBUFFS, 0.9995),
@@ -177,16 +180,20 @@ public class MainDriver {
 		TIME("Time", "Total ellasped time of the encounter and estimated clear time", "clock.png"),
 		HOLY_SYMBOL_DAMAGE("Holy Symbol Damage", "Estimated contribution of Holy Symbol", "holysymbol.png"),
 		HOLY_SYMBOL_DAMAGE_RAW("Holy Symbol Damage (Raw)", "Total damage dealt during Holy Symbol", "holysymbolraw.png"),
-		SMITE_AMP("Damage Amplified: ", "0"),
-		BLESSINGS_AMP("Damage Amplified: ", "0"),
-		SHIELDTOSS_AMP("Damage Amplified: ", "0"), //are these redundant or what
-		STATIC_FLASH_AMP("Damage Amplified: ", "0"),
-		CYCLONE_SHIELD_AMP("Damage Amplified: ", "0"),
-		PURIFYING_LIGHT_AMP("Damage Amplified: ", "0"),
-		SOUL_FLOCK_AMP("Damage Amplified: ", "0"),
-		ARIELS_WINGS_AMP("Damage Amplified: ", "0"),
-		MOD_AMP("Damage Amplified: ", "0"),
-		MADRIA_AMP("Damage Amplified: ", "0"),
+		SMITE_AMP("Damage Amplified: ", "0", "smitingaura.png"),
+		BLESSINGS_AMP("Damage Amplified: ", "0", "blessings.png"),
+		VITALITY_AMP("Damage Amplified: ", "0", "vitality.png"),
+		EAGLESQUAD_AMP("Damage Amplified: ", "0", "eaglesquad.png"),
+		WARHORN_AMP("Damage Amplified: ", "0", "warhorn.png"),
+		FOCUSSEAL_AMP("Damage Amplified: ", "0", "focusseal.png"),
+		SHIELDTOSS_AMP("Damage Amplified: ", "0", "shieldtoss.png"), //are these redundant or what
+		STATIC_FLASH_AMP("Damage Amplified: ", "0", "staticflash.png"),
+		CYCLONE_SHIELD_AMP("Damage Amplified: ", "0", "cycloneshield.png"),
+		PURIFYING_LIGHT_AMP("Damage Amplified: ", "0", "purifyinglight.png"),
+		SOUL_FLOCK_AMP("Damage Amplified: ", "0", "soulflock.png"),
+		ARIELS_WINGS_AMP("Damage Amplified: ", "0", "arielswings.png"),
+		MOD_AMP("Damage Amplified: ", "0", "markofdeath.png"),
+		MADRIA_AMP("Damage Amplified: ", "0", "madria.png"),
 		DUNGEON_COMPLETE("Dungeon Complete", "Flag for dungeon completion", "complete.png", Resolution.DUNGEON_CLEAR),
 		TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "dead.png", Resolution.TOMBSTONE, 0.99),
 		//TOMBSTONE("Tombstoned", "You are stuck under a tombstone - all buffs are wiped", "tombstone.png", "tombstone2.png", Resolution.TOMBSTONE),
@@ -373,6 +380,34 @@ public class MainDriver {
 			return name;
 		}
 	}
+	
+	public static TrackPoint getOrigin(TrackPoint tp) {
+		if (tp.getImage().contains("smiting"))
+			return TrackPoint.SMITE;
+		if (tp.getImage().contains("blessings"))
+			return TrackPoint.BLESSINGS;
+		if (tp.getImage().contains("vitality"))
+			return TrackPoint.VITALITY;
+		if (tp.getImage().contains("eaglesquad"))
+			return TrackPoint.EAGLE_SQUAD;
+		if (tp.getImage().contains("warhorn"))
+			return TrackPoint.WARHORN;
+		if (tp.getImage().contains("focusseal"))
+			return TrackPoint.FOCUSSEAL;
+		if (tp.getImage().contains("shieldtoss"))
+			return TrackPoint.SHIELDTOSS;
+		if (tp.getImage().contains("staticflash"))
+			return TrackPoint.STATIC_FLASH;
+		if (tp.getImage().contains("cycloneshield"))
+			return TrackPoint.CYCLONE_SHIELD;
+		if (tp.getImage().contains("purifyinglight"))
+			return TrackPoint.PURIFYING_LIGHT;
+		if (tp.getImage().contains("soulflock"))
+			return TrackPoint.SOUL_FLOCK;
+		if (tp.getImage().contains("arielswings"))
+			return TrackPoint.ARIELS_WINGS;
+		return tp;
+	}
 
 	private static OverlayFrame overlay = new OverlayFrame();
 	private static GraphFrame report = new GraphFrame();
@@ -512,7 +547,11 @@ public class MainDriver {
         data.put(TrackPoint.SHIELDTOSS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.STATIC_FLASH_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.SMITE_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DAMAGE_AMP)); //assumes max level
-        data.put(TrackPoint.BLESSINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DAMAGE_AMP)); //assumes max level. may be inaccurate
+        data.put(TrackPoint.BLESSINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.ATTACK_BUFF)); //assumes max level
+        data.put(TrackPoint.VITALITY_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.ATTACK_BUFF)); //assumes max level
+        data.put(TrackPoint.EAGLE_SQUAD, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.ATTACK_BUFF)); //assumes max level
+        data.put(TrackPoint.WARHORN_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.12, DeltaCollection.ATTACK_BUFF)); //assumes max level
+        data.put(TrackPoint.FOCUSSEAL_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.046, DeltaCollection.ATTACK_BUFF)); //assumes max level
         data.put(TrackPoint.POISON_EDGE, new HitMissCollection());
         data.put(TrackPoint.POISON_VIAL, new HitMissCollection());
         data.put(TrackPoint.RAGING_TEMPEST, new HitMissCollection());
@@ -538,6 +577,7 @@ public class MainDriver {
         data.put(TrackPoint.CELESTIAL_LIGHT, new HitMissCollection());
         data.put(TrackPoint.SHIELD_MASTERY, new HitMissCollection());
         data.put(TrackPoint.SPIRIT, new HitMissCollection());
+        data.put(TrackPoint.ACC_DEBUFF, new HitMissCollection());
         data.put(TrackPoint.HOLY_SYMBOL, new HitMissCollection());
         data.put(TrackPoint.WEAPON_PROC,  new HitMissCollection()); //Sound.PROC, 21));
         data.put(TrackPoint.DUNGEON_COMPLETE, new HitMissCollection());
@@ -571,7 +611,7 @@ public class MainDriver {
         
         //knight awakening
         data.put(TrackPoint.CYCLONE_SHIELD, new HitMissCollection(TrackPoint.CYCLONE_SHIELD_AMP));
-        data.put(TrackPoint.CYCLONE_SHIELD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.08, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
+        data.put(TrackPoint.CYCLONE_SHIELD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.DIVINE_RETRIBUTION, new HitMissCollection());
         
         //priest awakening
@@ -582,12 +622,14 @@ public class MainDriver {
         data.put(TrackPoint.HEAVENS_WRATH, new HitMissCollection());
         data.put(TrackPoint.GREATER_HEAL, new HitMissCollection());
         data.put(TrackPoint.VITALITY, new HitMissCollection());
+        data.put(TrackPoint.EAGLE_SQUAD, new HitMissCollection());
         
         //soul binder awakening
         data.put(TrackPoint.SOUL_DISSONANCE, new HitMissCollection());
         data.put(TrackPoint.SOUL_FLOCK, new HitMissCollection(TrackPoint.SOUL_FLOCK_AMP));
         data.put(TrackPoint.SOUL_FLOCK_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.18, DeltaCollection.DEFENSE_DEBUFF)); //assumes max level
         data.put(TrackPoint.VISION_TORRENT, new HitMissCollection());
+        data.put(TrackPoint.SOUL_CRYSTAL, new HitMissCollection());
 
         data.put(TrackPoint.STATIC_FLASH, new HitMissCollection(TrackPoint.STATIC_FLASH_AMP));
         
@@ -875,9 +917,9 @@ public class MainDriver {
 		    			m = r.exists(tp.getSecondaryImage(), 0.01);
 		    		}
 	    		}
-	    		if ((tp.getName().contains("Purify") || tp.getName().contains("Aggro")) && m != null) {
+	    		/*if ((tp.getName().contains("Purify") || tp.getName().contains("Aggro")) && m != null) {
 	    			System.out.println(tp.getName()+": "+m.getScore());
-	    		}
+	    		}*/
 				hit = m != null && m.getScore() >= tp.getThreshold();
 				if (tp.getReq() != null) {
 	    	        Region r = regionMap.get(tp.getRegionIndex());
@@ -998,7 +1040,7 @@ public class MainDriver {
 		    			System.out.println("Starting: "+value);
 		    			lastHPReading = value;
 		    			firstHPReading = value;
-		    			if (m != null && value.compareTo(BigInteger.ZERO) > 0)
+		    			if (m != null && value.compareTo(new BigInteger("10000000")) > 0)
 		    				start();
 	    			}
     	        }

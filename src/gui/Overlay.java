@@ -12,7 +12,6 @@ import javax.swing.JFrame;
 import javax.swing.border.BevelBorder;
 
 import model.DataCollection;
-import model.HitMissCollection;
 import model.MainDriver;
 import model.MainDriver.TrackPoint;
 import model.TimeCollection;
@@ -46,12 +45,13 @@ public class Overlay extends AbstractLabel {
     private static final GuiButton[] BUTTONS = {
 		GuiButton.UPDATE, 
 		GuiButton.CLOSE, GuiButton.MUTE, GuiButton.PAUSE,
-		GuiButton.REPORT, GuiButton.RESET
+		GuiButton.REPORT, GuiButton.RESET, GuiButton.MINIMIZE
     };
     
     
     private static final TrackPoint[] PERSONAL = {
     	TrackPoint.SPIRIT,
+    	TrackPoint.ACC_DEBUFF,
     	TrackPoint.GUARDIAN, TrackPoint.CELESTIAL_LIGHT,
     	TrackPoint.HEAVENS_WRATH, TrackPoint.GREATER_HEAL,
     	
@@ -74,7 +74,7 @@ public class Overlay extends AbstractLabel {
     	TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
     	TrackPoint.PERFECT_STORM, TrackPoint.FROST, TrackPoint.CHILL,
     	
-    	TrackPoint.VISION_TORRENT,
+    	TrackPoint.VISION_TORRENT, TrackPoint.SOUL_CRYSTAL,
     	
     	TrackPoint.CENTERED_MIND, TrackPoint.VENGEANCE_MAX,
     	TrackPoint.OVERCOME, TrackPoint.CONFIDENCE,
@@ -91,6 +91,7 @@ public class Overlay extends AbstractLabel {
     
     private static final TrackPoint[] BUFFS = {
     	TrackPoint.BLESSINGS, TrackPoint.VITALITY, TrackPoint.FOCUSSEAL, TrackPoint.SHARPEYES, TrackPoint.GREATER_SHARP_EYES,
+    	TrackPoint.EAGLE_SQUAD,
     	TrackPoint.HONINGRUNES, TrackPoint.WARHORN,
     	TrackPoint.HOLY_SYMBOL_DAMAGE, TrackPoint.HOLY_SYMBOL_DAMAGE_RAW
     };
@@ -130,7 +131,13 @@ public class Overlay extends AbstractLabel {
     }
 
     public void replaceTooltip(TrackPoint tp, int x, int y) {
-    	Tooltip toAdd = new Tooltip(x, y, tp.getName(), tp.getIntro());
+    	StringBuilder sb = new StringBuilder();
+    	sb.append(tp.getIntro());
+		if (tp.getName().contains("Blessings")) {
+			sb.append(" | Total Contribution: ");
+			sb.append(format(new BigDecimal(MainDriver.data.get(TrackPoint.BLESSINGS_AMP).getLast())));
+		}
+    	Tooltip toAdd = new Tooltip(x, y, tp.getName(), sb.toString());
     	OverlayFrame o = ((OverlayFrame)myFrame);
     	for (final Tooltip t : o.tooltipMappings.keySet()) {
     		if (t.getCoords()[0] == x && t.getCoords()[1] == y) {
@@ -155,6 +162,10 @@ public class Overlay extends AbstractLabel {
 		String string = bigDecimal.stripTrailingZeros().toPlainString();
 		int index = string.indexOf(".");
 		return index < 0 ? 0 : string.length() - index - 1;
+	}
+	
+	public static String format(BigInteger number) {
+		return format(new BigDecimal(number));
 	}
 	
 	/**
@@ -210,7 +221,7 @@ public class Overlay extends AbstractLabel {
         if (!MainDriver.active) {
             drawFilm(theGraphics, Color.GRAY);
         }
-        if (MainDriver.started) {
+        if (MainDriver.started && !OverlayFrame.compact) {
 	        drawText(g2d, "Party Stats", FONT_SIZE, MARGIN,
 	                (int) (getSize().getHeight() * TEXT_PERCENT), 1,
 	                Color.WHITE, SHADOW_COLOR.darker());
@@ -320,8 +331,8 @@ public class Overlay extends AbstractLabel {
 	        for (int i = 0; i < DEBUFFS.length; i++) {
 		        DataCollection dc = MainDriver.data.get(DEBUFFS[i]);
 		        StringBuilder sb = new StringBuilder();
-		        //if (new BigInteger(dc.getLastAsString()).compareTo(BigInteger.ZERO) <= 0)
-		        //	continue;
+		        if (new BigInteger(dc.getLastAsString()).compareTo(BigInteger.ZERO) <= 0)
+		        	continue;
 		        sb.append(dc.getLastAsString());
 				sb.append("%");
 				if (DEBUFFS[i].getName().contains("Smiting")) {
@@ -388,8 +399,23 @@ public class Overlay extends AbstractLabel {
 	            addTooltip(MISC[i], x, y);
 	        }
         } else {
-        	try {
-	        	if (MainDriver.liveVersion.equals("???")) {
+        	if (MainDriver.started) {
+        		if (MainDriver.active) {
+    		        drawNormalTextCentered(g2d, "Collecting data...", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+    		                (int) (getSize().getHeight() * 0.55), 1,
+    		                Color.WHITE, SHADOW_COLOR.darker());
+        		} else {
+    		        drawNormalTextCentered(g2d, "Analysis complete. Maximize to view data!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+    		                (int) (getSize().getHeight() * 0.55), 1,
+    		                Color.WHITE, SHADOW_COLOR.darker());
+        		}
+        		
+        	} else try {
+        		if (OverlayFrame.compact) {
+			        drawNormalTextCentered(g2d, "Enter combat with a boss to begin!", FONT_SIZE,  (int) (getSize().getWidth() * 0.5),
+			                (int) (getSize().getHeight() * 0.55), 1,
+			                Color.WHITE, SHADOW_COLOR.darker());        			
+        		} else if (MainDriver.liveVersion.equals("???")) {
 			        drawText(g2d, "Unable to check versions.", FONT_SIZE,  (int) (getSize().getWidth() * 0.3),
 			                (int) (getSize().getHeight() * 0.3), 1,
 			                Color.WHITE, SHADOW_COLOR.darker());

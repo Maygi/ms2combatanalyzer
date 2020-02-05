@@ -46,6 +46,7 @@ public class Graph extends AbstractLabel {
 	
 	private static final int ITEMS_PER_PAGE = 5;
 	
+	protected String currentView = "Party DPS";
 	protected String currentTab = "Personal";
 	protected int currentPage = 0;
 	
@@ -101,6 +102,7 @@ public class Graph extends AbstractLabel {
 
     
     private static final TrackPoint[] PERSONAL = {
+    	TrackPoint.ACC_DEBUFF,
     	TrackPoint.GUARDIAN, TrackPoint.CELESTIAL_LIGHT,
     	TrackPoint.HEAVENS_WRATH, TrackPoint.GREATER_HEAL,
     	
@@ -118,6 +120,8 @@ public class Graph extends AbstractLabel {
     	
     	TrackPoint.POISON_EDGE, TrackPoint.POISON_VIAL, TrackPoint.RETALIATION, TrackPoint.MESOGUARD, TrackPoint.HASTE,
     	//TrackPoint.RUSH,
+    	
+    	TrackPoint.VISION_TORRENT, TrackPoint.SOUL_CRYSTAL,
     	
     	TrackPoint.FLAME_WAVE, TrackPoint.FLAME_IMP, TrackPoint.MANA_CONTROL, TrackPoint.MANA_CONTROL2,
     	TrackPoint.PERFECT_STORM, TrackPoint.FROST, TrackPoint.CHILL,
@@ -137,7 +141,21 @@ public class Graph extends AbstractLabel {
     private static final TrackPoint[] BUFFS = {
     	TrackPoint.BLESSINGS, TrackPoint.VITALITY, TrackPoint.FOCUSSEAL, TrackPoint.SHARPEYES, TrackPoint.GREATER_SHARP_EYES,
     	TrackPoint.HONINGRUNES, TrackPoint.WARHORN,
+    	TrackPoint.EAGLE_SQUAD,
     	TrackPoint.HOLY_SYMBOL
+    };
+    
+    private static final TrackPoint[] BUFF_AMP = {
+    	TrackPoint.BLESSINGS_AMP, TrackPoint.VITALITY_AMP,
+    	TrackPoint.EAGLESQUAD_AMP,
+    	TrackPoint.WARHORN_AMP, TrackPoint.FOCUSSEAL_AMP
+    };
+    
+    private static final TrackPoint[] DEBUFF_AMP = {
+    	TrackPoint.ARIELS_WINGS_AMP, TrackPoint.SOUL_FLOCK_AMP, TrackPoint.STATIC_FLASH_AMP,
+    	TrackPoint.CYCLONE_SHIELD_AMP, TrackPoint.SHIELDTOSS_AMP,
+    	
+    	TrackPoint.PURIFYING_LIGHT_AMP, TrackPoint.MOD_AMP, TrackPoint.MADRIA_AMP, TrackPoint.SMITE_AMP
     };
 
     
@@ -152,7 +170,8 @@ public class Graph extends AbstractLabel {
     };
 
     private static final GuiButton[] BUTTONS = {
-		GuiButton.PERSONAL, GuiButton.BUFFS, GuiButton.DEBUFFS, GuiButton.UP, GuiButton.DOWN
+		GuiButton.PERSONAL, GuiButton.BUFFS, GuiButton.DEBUFFS, GuiButton.UP, GuiButton.DOWN,
+		GuiButton.PARTY_DPS, GuiButton.BUFF_BREAKDOWN
     };
 
     public void addTooltip(TrackPoint tp, int x, int y) {
@@ -178,86 +197,123 @@ public class Graph extends AbstractLabel {
         BigInteger highest = new BigInteger("-1");
         int mouseIndex = -1;
         List<Point> graphPoints = new ArrayList<Point>();
-        if (raidDamage.size() < 1) {
-        	//System.out.println("Not enough data to graph.");
-        } else {
-	        for (int i = 0; i < raidDamage.size(); i++) {
-	        	BigInteger value = raidDamage.get(i);
-	        	if (value.compareTo(highest) > 0)
-	        		highest = value;
+        if (currentView.equalsIgnoreCase("Party DPS")) {
+	        if (raidDamage.size() < 1) {
+	        	//System.out.println("Not enough data to graph.");
+	        } else {
+		        for (int i = 0; i < raidDamage.size(); i++) {
+		        	BigInteger value = raidDamage.get(i);
+		        	if (value.compareTo(highest) > 0)
+		        		highest = value;
+		        }
+		        highest = new BigInteger(Integer.toString(makePretty((int)((double)highest.intValue() * (1 + GRAPH_MARGIN_PERCENT)))));
+		        for (int i = 0; i < raidDamage.size(); i++) {
+		        	BigInteger value = raidDamage.get(i);
+		        	double xPerc = (double)i / (double)raidDamage.size();
+		        	double yPerc = (double)value.intValue() / (double)highest.intValue(); //this is ok for now, until we get to 2B party dps lol
+		        	int x = GRAPH_ORIGIN[0] + (int)(xPerc * GRAPH_DIM[0]);
+		        	int y = GRAPH_ORIGIN[1] + GRAPH_DIM[1] - (int)(yPerc * GRAPH_DIM[1]);
+		        	graphPoints.add(new Point(x, y));
+		        }
 	        }
-	        highest = new BigInteger(Integer.toString(makePretty((int)((double)highest.intValue() * (1 + GRAPH_MARGIN_PERCENT)))));
-	        for (int i = 0; i < raidDamage.size(); i++) {
-	        	BigInteger value = raidDamage.get(i);
-	        	double xPerc = (double)i / (double)raidDamage.size();
-	        	double yPerc = (double)value.intValue() / (double)highest.intValue(); //this is ok for now, until we get to 2B party dps lol
-	        	int x = GRAPH_ORIGIN[0] + (int)(xPerc * GRAPH_DIM[0]);
-	        	int y = GRAPH_ORIGIN[1] + GRAPH_DIM[1] - (int)(yPerc * GRAPH_DIM[1]);
-	        	graphPoints.add(new Point(x, y));
-	        }
-        }
-        g2d.setColor(Color.DARK_GRAY);
-        g2d.fillRect(GRAPH_ORIGIN[0], GRAPH_ORIGIN[1] - (int)(GRAPH_DIM[1] * (GRAPH_MARGIN_PERCENT)), GRAPH_DIM[0], (int)(GRAPH_DIM[1] * (1 + GRAPH_MARGIN_PERCENT)));
+	        g2d.setColor(Color.DARK_GRAY);
+	        g2d.fillRect(GRAPH_ORIGIN[0], GRAPH_ORIGIN[1] - (int)(GRAPH_DIM[1] * (GRAPH_MARGIN_PERCENT)), GRAPH_DIM[0], (int)(GRAPH_DIM[1] * (1 + GRAPH_MARGIN_PERCENT)));
 
+	        g2d.setColor(Color.GRAY);
+	        for (int i = 0; i < timeTicks; i++) {
+	        	int x = GRAPH_ORIGIN[0] + (GRAPH_DIM[0] / timeTicks) * (i);
+	        	int y1 = GRAPH_ORIGIN[1] + GRAPH_DIM[1];
+	        	int y2 = GRAPH_ORIGIN[1] + GRAPH_DIM[1] - (timeTicks % 2 == 0 ? 20 : 10);
+	        	if (i % 2 == 0 || timeTicks < 4) {
+	    	        drawNormalText(g2d, MainDriver.timeToString(i * 30), FONT_SIZE / 2, x - 8, y1 + 24, 1, Color.WHITE, SHADOW_COLOR.darker());
+	        	}
+	            g2d.setColor(Color.GRAY);
+	        	g2d.drawLine(x, y1, x, y2);
+	        	
+	        }
+	        Point p = MouseInfo.getPointerInfo().getLocation();
+	    	Point diff = getLocationOnScreen();
+	    	p.translate((int)(-1 * diff.getX()), (int)(-1 * diff.getY()));
+	        for (int i = 0; i < graphPoints.size() - 1; i++) { //draw death areas before y markers
+	        	try {
+		        	boolean dead = deaths.getRawData().get(i);
+		        	int x1 = (int)graphPoints.get(i).getX();
+		        	int x2 = (int)graphPoints.get(i + 1).getX();
+		        	if (dead) {
+		            	g2d.setColor(DEATH_GRAY);
+		        		g2d.fillRect(x1, GRAPH_ORIGIN[1], x2 - x1, GRAPH_DIM[1]);
+		        	}
+	        	} catch (Exception e) {
+	        		
+	        	}
+	        }
+	        for (int i = 0; i < GRAPH_Y_MARKERS; i++) {
+	        	int x1 = GRAPH_ORIGIN[0];
+	        	int x2 = GRAPH_ORIGIN[0] + GRAPH_DIM[0];
+	        	int y = (int)(GRAPH_ORIGIN[1] + GRAPH_DIM[1] * ((double)i / GRAPH_Y_MARKERS));
+	        	g2d.drawLine(x1, y, x2, y);
+	        }
+	        for (int i = 0; i < graphPoints.size() - 1; i++) {
+	        	int x1 = (int)graphPoints.get(i).getX();
+	        	int y1 = (int)graphPoints.get(i).getY();
+	        	int x2 = (int)graphPoints.get(i + 1).getX();
+	        	int y2 = (int)graphPoints.get(i + 1).getY();
+	        	g2d.setColor(GRAPH_LINE_COLOR);
+	        	g2d.setStroke(new BasicStroke(GRAPH_LINE_WIDTH));
+	        	g2d.drawLine(x1, y1, x2, y2);
+	        	if (p.getX() >= x1 && p.getX() <= x2) {
+	        		mouseIndex = i;
+	        	}
+	        }
+	        //draw the numbers on the top
+	        for (int i = 0; i < GRAPH_Y_MARKERS; i++) {
+	        	int y = (int)(GRAPH_ORIGIN[1] + GRAPH_DIM[1] * ((double)i / GRAPH_Y_MARKERS));
+	            int value = (int)(highest.intValue() - (((double)i / GRAPH_Y_MARKERS) * highest.intValue()));
+		        drawNormalText(g2d, Integer.toString(value), FONT_SIZE, GRAPH_ORIGIN[0], y, 1, Color.WHITE, SHADOW_COLOR.darker());
+	        }
+        } else {
+	        g2d.setColor(Color.DARK_GRAY);
+	        g2d.fillRect(GRAPH_ORIGIN[0], GRAPH_ORIGIN[1] - (int)(GRAPH_DIM[1] * (GRAPH_MARGIN_PERCENT)), GRAPH_DIM[0] / 2 + 100, (int)(GRAPH_DIM[1] * (1 + GRAPH_MARGIN_PERCENT)));
+        	int x = GRAPH_ORIGIN[0] + 10;
+        	int y = GRAPH_ORIGIN[1];
+        	for (int i = 0; i < BUFF_AMP.length; i++) {
+    	        DataCollection dc = MainDriver.data.get(BUFF_AMP[i]);
+    	        DataCollection uptimeDc = MainDriver.data.get(MainDriver.getOrigin(BUFF_AMP[i]));
+    	        BigInteger value = dc.getLast();
+		        StringBuilder sb = new StringBuilder();
+		        sb.append(uptimeDc.getLastAsString());
+		        sb.append("% | ");
+		        sb.append(Overlay.format(value));
+    	       // if (value.compareTo(BigInteger.ZERO) <= 0)
+    	       // 	continue;
+        		drawImage(theGraphics, BUFF_AMP[i].getIcon(), x, y);
+		        drawNormalText(g2d, sb.toString(), FONT_SIZE, x + BUFF_SPACING, y + 20, 1, Color.WHITE, SHADOW_COLOR.darker());
+        		y += BUFF_SPACING;
+        	}
+        	x += 190;
+        	y = GRAPH_ORIGIN[1];
+        	for (int i = 0; i < DEBUFF_AMP.length; i++) {
+    	        DataCollection dc = MainDriver.data.get(DEBUFF_AMP[i]);
+    	        DataCollection uptimeDc = MainDriver.data.get(MainDriver.getOrigin(DEBUFF_AMP[i]));
+    	        BigInteger value = dc.getLast();
+		        StringBuilder sb = new StringBuilder();
+		        sb.append(uptimeDc.getLastAsString());
+		        sb.append("% | ");
+		        sb.append(Overlay.format(value));
+    	        //if (value.compareTo(BigInteger.ZERO) <= 0)
+    	        //	continue;
+        		drawImage(theGraphics, DEBUFF_AMP[i].getIcon(), x, y);
+		        drawNormalText(g2d, sb.toString(), FONT_SIZE, x + BUFF_SPACING, y + 20, 1, Color.WHITE, SHADOW_COLOR.darker());
+        		y += BUFF_SPACING;
+        	}
+        }
         for (final GuiButton b : BUTTONS) {
         	b.handleDraw(this, theGraphics);
         }
-        g2d.setColor(Color.GRAY);
-        for (int i = 0; i < timeTicks; i++) {
-        	int x = GRAPH_ORIGIN[0] + (GRAPH_DIM[0] / timeTicks) * (i);
-        	int y1 = GRAPH_ORIGIN[1] + GRAPH_DIM[1];
-        	int y2 = GRAPH_ORIGIN[1] + GRAPH_DIM[1] - (timeTicks % 2 == 0 ? 20 : 10);
-        	if (i % 2 == 0 || timeTicks < 4) {
-    	        drawNormalText(g2d, MainDriver.timeToString(i * 30), FONT_SIZE / 2, x - 8, y1 + 24, 1, Color.WHITE, SHADOW_COLOR.darker());
-        	}
-            g2d.setColor(Color.GRAY);
-        	g2d.drawLine(x, y1, x, y2);
-        	
-        }
-        Point p = MouseInfo.getPointerInfo().getLocation();
-    	Point diff = getLocationOnScreen();
-    	p.translate((int)(-1 * diff.getX()), (int)(-1 * diff.getY()));
-        for (int i = 0; i < graphPoints.size() - 1; i++) { //draw death areas before y markers
-        	try {
-	        	boolean dead = deaths.getRawData().get(i);
-	        	int x1 = (int)graphPoints.get(i).getX();
-	        	int x2 = (int)graphPoints.get(i + 1).getX();
-	        	if (dead) {
-	            	g2d.setColor(DEATH_GRAY);
-	        		g2d.fillRect(x1, GRAPH_ORIGIN[1], x2 - x1, GRAPH_DIM[1]);
-	        	}
-        	} catch (Exception e) {
-        		
-        	}
-        }
-        for (int i = 0; i < GRAPH_Y_MARKERS; i++) {
-        	int x1 = GRAPH_ORIGIN[0];
-        	int x2 = GRAPH_ORIGIN[0] + GRAPH_DIM[0];
-        	int y = (int)(GRAPH_ORIGIN[1] + GRAPH_DIM[1] * ((double)i / GRAPH_Y_MARKERS));
-        	g2d.drawLine(x1, y, x2, y);
-        }
-        for (int i = 0; i < graphPoints.size() - 1; i++) {
-        	int x1 = (int)graphPoints.get(i).getX();
-        	int y1 = (int)graphPoints.get(i).getY();
-        	int x2 = (int)graphPoints.get(i + 1).getX();
-        	int y2 = (int)graphPoints.get(i + 1).getY();
-        	g2d.setColor(GRAPH_LINE_COLOR);
-        	g2d.setStroke(new BasicStroke(GRAPH_LINE_WIDTH));
-        	g2d.drawLine(x1, y1, x2, y2);
-        	if (p.getX() >= x1 && p.getX() <= x2) {
-        		mouseIndex = i;
-        	}
-        }
-        //draw the numbers on the top
-        for (int i = 0; i < GRAPH_Y_MARKERS; i++) {
-        	int y = (int)(GRAPH_ORIGIN[1] + GRAPH_DIM[1] * ((double)i / GRAPH_Y_MARKERS));
-            int value = (int)(highest.intValue() - (((double)i / GRAPH_Y_MARKERS) * highest.intValue()));
-	        drawNormalText(g2d, Integer.toString(value), FONT_SIZE, GRAPH_ORIGIN[0], y, 1, Color.WHITE, SHADOW_COLOR.darker());
-        }
+
         
         int x = GRAPH_ORIGIN[0] - 32;
         int y = GRAPH_ORIGIN[1] + GRAPH_DIM[1] + 32;
-
         TrackPoint[] toUse;
         if (currentTab.equalsIgnoreCase("Personal"))
         	toUse = PERSONAL;
