@@ -549,7 +549,7 @@ public class MainDriver {
         data.put(TrackPoint.SMITE_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.DAMAGE_AMP)); //assumes max level
         data.put(TrackPoint.BLESSINGS_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.064, DeltaCollection.ATTACK_BUFF)); //assumes max level
         data.put(TrackPoint.VITALITY_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.ATTACK_BUFF)); //assumes max level
-        data.put(TrackPoint.EAGLE_SQUAD, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.ATTACK_BUFF)); //assumes max level
+        data.put(TrackPoint.EAGLESQUAD_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.1, DeltaCollection.ATTACK_BUFF)); //assumes max level
         data.put(TrackPoint.WARHORN_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.12, DeltaCollection.ATTACK_BUFF)); //assumes max level
         data.put(TrackPoint.FOCUSSEAL_AMP, new DeltaCollection(data.get(TrackPoint.HP), 0.046, DeltaCollection.ATTACK_BUFF)); //assumes max level
         data.put(TrackPoint.POISON_EDGE, new HitMissCollection());
